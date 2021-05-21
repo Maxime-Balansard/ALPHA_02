@@ -12,6 +12,7 @@ class MonsterSol extends ObjetEnnemi{
         this.setCollideWorldBounds(true);
         this.setBodySize(this.body.width-20,this.body.height-15);
         this.setDepth(10);
+        this.scene.events.on('update', (time, delta) => { this.update(time, delta)} );
 //définir les propriété que l'on va utiliser dans notre animation
 
         // X

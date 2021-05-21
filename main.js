@@ -1,6 +1,6 @@
 
-let width=24*64; //896;
-let height=14*64; //448;
+let width=14*64; //896;
+let height=7*64; //448;
 
 let config = {
     type: Phaser.AUTO,
@@ -12,18 +12,18 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 100*3 },
-            debug: false,
-            //debug: true,
+            gravity: { y: 100*9},
+           //debug: false,
+            debug: true,
         }
     },
     scene: [
         new Ui(),
 
-        new Menu("menu"),
+        //new Menu("menu"),
         new TableauTiled("Tiled pour les gros gros levels"),
         //new TableauPixelart("test"),
-        //new TableauBirdSpriteJson("Un oiseau! "),
+        
 
 
     ],

@@ -1,13 +1,5 @@
 class TableauTiled extends Tableau{
-    /**
-     * Ce tableau démontre comment se servir de Tiled, un petit logiciel qui permet de designer des levels et de les importer dans Phaser (entre autre).
-     *
-     * Ce qui suit est très fortement inspiré de ce tuto :
-     * https://stackabuse.com/phaser-3-and-tiled-building-a-platformer/
-     *
-     * Je vous conseille aussi ce tuto qui propose quelques alternatives (la manière dont son découpées certaines maisons notamment) :
-     * https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
-     */
+   
 
      constructor()
     {
@@ -18,7 +10,7 @@ class TableauTiled extends Tableau{
         
         // ------pour TILED-------------
         // nos images
-        this.load.image('tiles', 'assets/tilemaps/plat.png');
+        this.load.image('tiles', 'assets/tilemaps/SpriteSheet.png');
         this.load.image('plat128', 'assets/plat128.png');
         this.load.image('oni', 'assets/oni.png');
         this.load.image('star', 'assets/piece.png');
@@ -26,14 +18,14 @@ class TableauTiled extends Tableau{
         this.load.image('rouge', 'assets/rouge.png');
         this.load.image('rose', 'assets/rose.png');
 
-        //les données du tableau qu'on a créé dans TILED
-        this.load.tilemapTiledJSON('map', 'assets/tilemaps/niveauAlpha08.json');
+        this.load.image('test', 'assets/test.jpg');
 
-        // -----et puis aussi-------------
+
         this.load.image('yokai1', 'assets/yokai1.png');
         this.load.image('night', 'assets/ciel.png');
-        this.load.image('fleur', 'assets/fleur.png');
-        //atlas de texture généré avec https://free-tex-packer.com/app/
+
+        //les données du tableau qu'on a créé dans TILED
+        this.load.tilemapTiledJSON('map', 'assets/tilemaps/NiveauTuto3.json');
         //on y trouve notre étoiles et une tête de mort
         this.load.atlas('particles', 'assets/particles/particles.png', 'assets/particles/particles.json');
        
@@ -43,45 +35,36 @@ class TableauTiled extends Tableau{
         super.create();
         //on en aura besoin...
         let ici=this;
+
         //video
-       
         
+       
 
         //--------chargement de la tile map & configuration de la scène-----------------------
 
         //notre map
         this.map = this.make.tilemap({ key: 'map' });
         //nos images qui vont avec la map
-        this.tileset = this.map.addTilesetImage('plat','tiles');
+        this.tileset = this.map.addTilesetImage('SpriteSheet','tiles');
 
         //on agrandit le champ de la caméra du coup
         let largeurDuTableau=this.map.widthInPixels;
         let hauteurDuTableau=this.map.heightInPixels;
         this.physics.world.setBounds(0, 0, largeurDuTableau,  hauteurDuTableau);
         this.cameras.main.setBounds(0, 0, largeurDuTableau, hauteurDuTableau);
-        this.cameras.main.startFollow(this.player, true, 1, 1);
+        this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
 
         //---- ajoute les plateformes simples ----------------------------
         this.solides = this.map.createLayer('solides', this.tileset, 0, 0);
         this.lave = this.map.createLayer('lave', this.tileset, 0, 0);
         this.derriere = this.map.createLayer('derriere', this.tileset, 0, 0);
         this.devant = this.map.createLayer('devant', this.tileset, 0, 0);
+        this.devant2 = this.map.createLayer('devant2', this.tileset, 0, 0);
 
-        //on définit les collisions, plusieurs méthodes existent:
-
-        // 1 La méthode que je préconise (il faut définir une propriété dans tiled pour que ça marche)
-        //permet de travailler sur un seul layer dans tiled et des définir les collisions en fonction des graphiques
-        //exemple ici https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
-        //this.solides.setCollisionByProperty({ collides: true });
-        this.lave.setCollisionByProperty({ collides: true });
-
-        // 2 manière la plus simple (là où il y a des tiles ça collide et sinon non)
+        
+        this.lave.setCollisionByExclusion(-1, true);
         this.solides.setCollisionByExclusion(-1, true);
-        //this.lave.setCollisionByExclusion(-1, true);
-
-        // 3 Permet d'utiliser l'éditeur de collision de Tiled...mais ne semble pas marcher pas avec le moteur de physique ARCADE, donc oubliez cette option :(
-        //this.map.setCollisionFromCollisionGroup(true,true,this.plateformesSimples);
-
+       
         //----------------bonus 1------------------------
        this.bonus = this.physics.add.group({
             allowGravity: false,
@@ -147,17 +130,6 @@ class TableauTiled extends Tableau{
         this.laveFxContainer=this.add.container();
         this.lave.forEachTile(function(tile){ //on boucle sur TOUTES les tiles de lave pour générer des particules
             if(tile.index !== -1){ //uniquement pour les tiles remplies
-
-                /*
-                //dé-commenter pour mieux comprendre ce qui se passe
-                console.log("lave tile",tile.index,tile);
-                let g=ici.add.graphics();
-                laveFxContainer.add(g);
-                g.setPosition(tile.pixelX,tile.pixelY)
-                g.lineStyle(1,0xFF0000);
-                g.strokeRect(0, 0, 64, 64);
-                */
-
                 //on va créer des particules
                 let props={
                     frame: [
@@ -268,26 +240,9 @@ class TableauTiled extends Tableau{
         this.sky2.setOrigin(0,0);
         this.sky.setScrollFactor(0);//fait en sorte que le ciel ne suive pas la caméra
         this.sky2.setScrollFactor(0);//fait en sorte que le ciel ne suive pas la caméra
-       // this.sky2.blendMode=Phaser.BlendModes.ADD;
-        //pieces
-        //this.stars=this.physics.add.group();
-        //this.stars.create(600,0,"star").setCollideWorldBounds(true).setBounce(0.4);
-
-
-        //platforme perso
-
-      /*  this.bonus=this.physics.add.group();
        
-        this.bonus.create(500,400,"star").setCollideWorldBounds(true).setBounce(0.4);
-        this.physics.add.overlap(this.player, this.bonus, this.rammasserBonusUn, null, this);
 
-        this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(600,800,'plat128').setDisplaySize(128,15).refreshBody().setDepth(10);*/
-        //logo et ses effets
-        
-    
-
-
+        //this.add.sprite(2000, 500, 'oni');
             
         let logo1= this.add.image(200, 500, 'logo1');
        
@@ -324,7 +279,12 @@ class TableauTiled extends Tableau{
         //blendMode: 'ADD',
         emitZone: { source: rect1} 
     });
-        
+    //----exemple pou faire ensorte qu'un image appraisse quand on aprroche ou non  
+    
+    
+    
+    
+
         //----------collisions---------------------
 
         //quoi collide avec quoi?
@@ -337,7 +297,7 @@ class TableauTiled extends Tableau{
         this.physics.add.overlap(this.player, this.stars, this.ramasserEtoile, null, this);
         this.physics.add.overlap(this.player, this.bonus, this.rammasserBonusUn, null, this);
         //quand on touche la lave, on meurt
-        this.physics.add.collider(this.player, this.lave,this.playerDie,null,this);
+        this.physics.add.collider(this.player, this.lave,this.hitSpike,null,this);
 
         //--------- Z order -----------------------
 
@@ -354,6 +314,7 @@ class TableauTiled extends Tableau{
         this.stars.setDepth(z--);
     this.bonus.setDepth(z--);
         starsFxContainer.setDepth(z--);
+        this.devant2.setDepth(z--);
         this.devant.setDepth(z--);
         this.solides.setDepth(z--);
         this.laveFxContainer.setDepth(z--);
@@ -371,6 +332,34 @@ class TableauTiled extends Tableau{
         }, null, this);
         this.restoreCheckPoint();
     }
+
+
+/*
+    apparitionTexte(){
+
+        if(this.player.x<1900){
+            //this.tuto_dash.alpha=1;
+            Tableau.current.tweens.add({
+                targets: Tableau.current.oni,
+                alpha:1,
+                duration: 100,
+                ease: 'Sine.easeInOut',
+
+            })
+        }else if(this.player.x>=2100){
+            //this.tuto_dash.alpha=0;
+            Tableau.current.tweens.add({
+                targets: Tableau.current.oni,
+                alpha:0,
+                duration: 100,
+                ease: 'Sine.easeInOut',
+
+            })
+        }
+    }
+*/
+
+
 
     /**
      * Permet d'activer, désactiver des éléments en fonction de leur visibilité dans l'écran ou non

@@ -1,43 +1,49 @@
-class Player extends Phaser.Physics.Arcade.Sprite{
+class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, "player")
         scene.add.existing(this)
-        this.factorSpeed=1;
         scene.physics.add.existing(this)
+
+        this.dirX = 1;
+        this.estEnTrainDAttaquer = false;
+        this.rechargeSonCoup = false;
 
         this.setCollideWorldBounds(true)
         this.setGravityY(1200)
-        this.setBodySize(this.body.width,this.body.height+46);
-       this.setOffset(15, 0)
-        this.scale= 0.9;
-      
-   
-    
+        this.setBodySize(this.body.width, this.body.height + 46);
+        this.setOffset(15, 0)
+        this.scale = 0.9;
+        this.doubleJump = false;
+        this.jumpCount = 0;
+
+        this.speedFactor = 1;
+        this.vitesse = 0;
+
 
         this.anims.create({
             key: 'left',
-            frames: this.anims.generateFrameNumbers('yasuo2', { start: 0, end: 7}),
+            frames: this.anims.generateFrameNumbers('yasuo2', {start: 0, end: 7}),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
             key: 'right',
-            frames: this.anims.generateFrameNumbers('yasuo2', { start: 9, end: 16}),
+            frames: this.anims.generateFrameNumbers('yasuo2', {start: 9, end: 16}),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
             key: 'stance',
-            frames: this.anims.generateFrameNumbers('iddle', { start: 0, end: 7  }),
+            frames: this.anims.generateFrameNumbers('iddle', {start: 0, end: 7}),
             frameRate: 5,
             repeat: -1
         });
-        
+
         this.anims.create({
             key: 'back',
-            frames: this.anims.generateFrameNumbers('iddle2', { start: 7, end: 0  }),
+            frames: this.anims.generateFrameNumbers('iddle2', {start: 7, end: 0}),
             frameRate: 8,
 
             repeat: -1
@@ -45,188 +51,222 @@ class Player extends Phaser.Physics.Arcade.Sprite{
 
         this.anims.create({
             key: 'turn',
-            frames: [ { key: 'yasuo2', frame: 8 } ],
+            frames: [{key: 'yasuo2', frame: 8}],
             frameRate: 20
         });
 
-        this._directionX=0;
-        this._directionY=0;
+        this.anims.play('stance');
+        this._directionX = 0;
+        this._directionY = 0;
 
     }
 
-    set directionX(value){
-        this._directionX=value;
+    set directionX(value) {
+        this._directionX = value;
     }
-    set directionY(value){
-        this._directionY=value;
+
+    set directionY(value) {
+        this._directionY = value;
     }
 
     /**
      * arrête le joueur
      */
-    stop(){
+    stop() {
         this.setVelocityX(0);
         this.setVelocityY(0);
-        this.setAccelerationX(0);
-        this.directionY=0;
-        this.directionX=0;
-    }
-    move(){
 
-        this.sens=1;
-        //console.log(this.sens*this.factorSpeed)
-        switch (true){
-            case this._directionX<0:
-               // console.log("a")
-                this.sens=-1;
-                this.setVelocityX(this.sens*300*this.factorSpeed);
-               //this.setFriction(-1,1);
-                //autre deplacement ( le perso accelere) mais bug avec le saut le pp peut pas sauter
-               /*this.setAccelerationX(-200);
-                 this.setMaxVelocity(-800);*/
-                
-               // this.setFrictionX(0.5);
+        this.directionY = 0;
+        this.directionX = 0;
+    }
+
+    move() {
+
+        //this.sens=1;
+        this.body.velocity.y = Math.min(800, Math.max(-800, this.body.velocity.y));
+
+        switch (true) {
+            case this._directionX < 0:
+                this.sens = -1;
+                this.setVelocityX(this.sens * 240 * this.speedFactor);
+                this.vitesse = 1;
                 this.anims.play('left', true);
                 break;
-            case this._directionX>0:
-               // console.log("b")
-                this.sens=1;    
-                this.setVelocityX(this.sens*300*this.factorSpeed);
-               // this.setFriction(300);
-                 //autre deplacement ( le perso accelere) mais bug avec le saut le pp peut pas sauter
-               /*this.setAccelerationX(200);
-                this.setMaxVelocity(800);*/
-                
+            case this._directionX > 0:
+                this.sens = 1;
+                this.setVelocityX(this.sens * 240 * this.speedFactor);
+                this.vitesse = 1;
                 this.anims.play('right', true);
                 break;
             default:
-              //  console.log("c")
+                this.vitesse = 0;
                 this.setVelocityX(0);
-                this.setAccelerationX(0);
-                
-               this.anims.play('turn');
-                this.anims.play(this.sens===-1 ? 'back' : 'stance' ,true);
+
+                //this.anims.play('turn');
+                this.anims.play(this.sens === -1 ? 'back' : 'stance', true);
         }
 
-        if(this._directionY<0){
-            if(this.body.blocked.down || this.body.touching.down){
-                this.setVelocityY(-650);
+        if (this._directionY < 0 && !this.doubleJump) {
+
+            this.setVelocityY(-400);
+            this.jumpCount += 1;
+            if (!this.body.blocked.down && this.jumpCount >= 10 && !this.doubleJump) {
+                //console.log('hello');
+                this.setVelocityY(-500);
+                this.doubleJump = true;
             }
+
+        }
+        //console.log(this.jumpCount);
+        //console.log(this.doubleJump);
+
+
+        if (this.body.blocked.down) {
+            this.doubleJump = false;
+            this.jumpCount = 0;
         }
 
 
     }
 
- /*   doublejump(){
-        var onTheGround = this.player.body.touching.down;
 
-        
-        if (onTheGround) {
-            this.jumps = 2;
-            this.jumping = false;
-        }
-    
-       
-        if (this.jumps > 0 && this.upInputIsActive(ArrowUp)) {
-            this.player.body.velocityY= -650;
-            this.jumping = true;
-        }
-    
-       
-        if (this.jumping && this.upInputReleased()) {
-            this.jumps--;
-            this.jumping = false;
-        }
-    };*/
+    /*dash(){
+        console.log('coucou');
 
-        
+       this.setTint(0xff0000);
 
-    
-    
-    
-     dash(){
-        this.posX = this.x;
-        this.posY = this.y;
+       let direction = -1;
 
-        var direct;
-        //this.setVelocityX(3000);
+       Tableau.current.tweens.timeline({
+           targets: Tableau.current.player.body.velocity,
+           ease: 'Circ.easeInOut',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+           duration: 50,
+           loop: 0,
+           tweens: [
+               {
+                   targets: Tableau.current.player.body.velocity,
+                   x: 3000 *direction
+               },
+               {
+                   targets: Tableau.current.player.body.velocity,
+                   x: 0
+               }
+           ]
+       });
 
-        if (this._directionX < 0 || this.sens===-1) { 
-            direct = this.posX - 5;
-        } else if (this._directionX > 0 || this.sens===1) {
-            direct = this.posX + 5;
+       /**this.posX = this.x;
+       this.posY = this.y;
+       var direct;
+
+
+       this.scene.cameras.main.shake(200,0.004,true,);
+
+       if (this._directionX < 0 || this.sens===-1) {
+           direct = this.posX - 5;
+       } else if (this._directionX > 0 || this.sens===1) {
+           direct = this.posX + 5;
+       }
+       if (direct < this.posX) {
+           this.animGauche();
+       } else if (direct > this.posX) {
+           this.animDroite();
+       }*/
+
+
+    /* animDroite(){
+         console.log('dash droite')
+
+
+
+
+   }*/
+
+
+    dash() {
+
+        //permet de dasher en étant immobile
+        if (this.rechargeSonCoup === false) {
+            Tableau.current.cameras.main.flash(500);
+            this._directionX = this.sens;
+            this.speedFactor = 1;
+            this.speedFactorMax = 1;
+
+
+            if (this.speedFactor >= this.speedFactorMax) {
+                this.speedFactor = 1;
+            }
+
+            let me = this;
+
+            //permet de dire que si le perso est immobile etqu'il dash, il redevient immobile à la fin du dash
+            if (this.vitesse === 0) {
+                setTimeout(function () {
+                    me.speedFactor = 0;
+                    me._directionX = 0;
+                }, 150)
+            }
+            //permet de faire revenir à la vitesse normale après un dash quand le perso est en mouvement
+            if (this._directionX > 0 || this._directionX < 0) {
+                setTimeout(function () {
+                    me.speedFactor = 1;
+                }, 150)
+            }
+
+
+            console.log('dash');
+            this.posX = this.x;
+            this.posY = this.y;
+            var dir;
+
+            if (this._directionX < 0 || this.sens === -1) { //sens===-1 pour dasher dans le sens ou on regarde quand on est immobile
+                dir = this.posX - 5;
+            } else if (this._directionX > 0 || this.sens === 1) {
+                dir = this.posX + 5;
+            }
+
+            if (dir < this.posX) {
+                this.scene.tweens.add({
+                    targets: this,
+                    speedFactor: '+=3',
+                    ease: 'Circ.easeInOut',
+                    duration: 100,
+                });
+
+
+                console.log('dash à gauche');
+            } else if (dir > this.posX) {
+                this.scene.tweens.add({
+                    targets: this,
+                    speedFactor: '+=3',
+                    ease: 'Circ.easeInOut',
+                    duration: 100,
+                });
+
+
+                console.log('dash à droite');
+            }
+
         }
-        if (direct < this.posX) {
-            this.animGauche();
-            this.setVelocityX(-600);
-        
-        } else if (direct > this.posX) {
-            this.animDroite();
-            this.setVelocityX(600);
-            
-        }
 
-       /* if (this._directionY < 0 || this.sens===-1) { 
-            direct = this.posY - 5;
-        } else if (this._directionY> 0 || this.sens===1) {
-            direct = this.posY + 5;
-        }
-        if (direct < this.posY) {
-            
-            this.animBas();
-        
-        } else if (direct > this.posY) {
-            this.animHaut();
-            
-        }*/
 
     }
 
-    animDroite(){
-    
-        Tableau.current.tweens.timeline({
-            targets: Tableau.current.player.body.velocity,
-            ease: 'Circ.easeInOut',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
-            duration: 50,
-            loop: 0,
-            tweens: [
-                {
-                    targets: Tableau.current.player.body.velocity,
-                    x: 3000
-                },
-                {
-                    targets: Tableau.current.player.body.velocity,
-                    x: 0
-                }
-            ]
-        });
-        
-     
-             
-  }
- 
-    animGauche(){
-        Tableau.current.tweens.timeline({
-            targets: Tableau.current.player.body.velocity,
-            ease: 'Circ.easeInOut',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
-            duration: 50,
-            loop: 0,
-            tweens: [
-                {
-                    targets: Tableau.current.player.body.velocity,
-                    x: -3000
-                },
-                {
-                    targets: Tableau.current.player.body.velocity,
-                    x: 0
-                }
-            ]
-        });
+    attaque() {
+
+        if (this.rechargeSonCoup === false) {
+            this.rechargeSonCoup = true;
+            console.log("att 2 sec, je viens de frapper!");
+            Tableau.current.epee.setPosition(this.x + (100 * this.sens), this.y);
+            setTimeout(function () {
+                Tableau.current.player.estEnTrainDAttaquer = false;
+                Tableau.current.epee.setPosition(-1000, -1000);
+            }, 200);
+            setTimeout(function () {
+                Tableau.current.player.rechargeSonCoup = false;
+                console.log("j'ai fini maman");
+            }, 1500);
+        }
     }
 
 
-    
-
- 
-    
 }

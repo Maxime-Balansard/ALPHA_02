@@ -29,6 +29,7 @@ class GameKeyboard extends Phaser.GameObjects.Container{
         this.cursors = scene.input.keyboard.createCursorKeys();
        
         scene.input.keyboard.on('keydown', function(kevent){
+            if(Tableau.current && Tableau.current.player){
             switch (kevent.key){
                 case "ArrowRight":
                     Tableau.current.player.directionX=1;
@@ -48,15 +49,19 @@ class GameKeyboard extends Phaser.GameObjects.Container{
                 case "ArrowDown":
                     Tableau.current.player.directionY=1;
                     break;
-                
+
                 case "Shift":
-                console.log('spaceOn')
-                break;
+                    Tableau.current.player.attaque();
+                    console.log("shifton");
+                    break;
                 
+                }
         
             }
         });
         scene.input.keyboard.on('keyup', function(kevent){
+            //console.log(kevent)
+            if(Tableau.current && Tableau.current.player){
             switch (kevent.key){
                 case "ArrowRight":
                     Tableau.current.player.directionX=0;
@@ -76,10 +81,15 @@ class GameKeyboard extends Phaser.GameObjects.Container{
                     Tableau.current.player.directionY=0;
                     break;
 
-                    case "Shift":
-                        console.log('spaceOf')
-                        break;
+                case " ":
+                    Tableau.current.player.dash();
+                    Tableau.current.player.attaque();
+                    console.log('spaceOf')
+                    break;
+
+
             }
+        }
         });
 
 
