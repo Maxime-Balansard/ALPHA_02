@@ -1,10 +1,9 @@
-
-let width=14*64; //896;
-let height=7*64; //448;
+let width = 14 * 64; //896;
+let height = 7 * 64; //448;
 
 let config = {
     type: Phaser.AUTO,
-    pixelArt: true,
+    //zpixelArt: true,
 
     //pixelArt: true,
 
@@ -12,9 +11,9 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 100*9},
-           //debug: false,
-            debug: true,
+            gravity: {y: 100 * 8},
+            debug: false,
+            //debug: true,
         }
     },
     scene: [
@@ -23,7 +22,6 @@ let config = {
         //new Menu("menu"),
         new TableauTiled("Tiled pour les gros gros levels"),
         //new TableauPixelart("test"),
-        
 
 
     ],
@@ -31,7 +29,7 @@ let config = {
     height: height,
     scale: {
         mode: Phaser.Scale.FIT,
-        orientation:Phaser.Scale.LANDSCAPE,
+        orientation: Phaser.Scale.LANDSCAPE,
         parent: 'game',
         width: width,
         height: height,
@@ -40,15 +38,16 @@ let config = {
             height: 0
         },
         max: {
-            width: width*1.5,
-            height: height*1.5
+            width: width * 1.5,
+            height: height * 1.5
         },
-        autoCenter:Phaser.Scale.Center.CENTER_BOTH
+        autoCenter: Phaser.Scale.Center.CENTER_BOTH
 
     },
     autoRound: false
 };
 let game;
+
 function resize() {
     /*
     var canvas = document.querySelector("canvas");
@@ -73,8 +72,9 @@ function resize() {
      */
 
 }
-window.onload = function() {
-    game=new Phaser.Game(config);
+
+window.onload = function () {
+    game = new Phaser.Game(config);
     window.addEventListener("resize", resize, false);
     window.addEventListener("scroll", resize, false);
 }

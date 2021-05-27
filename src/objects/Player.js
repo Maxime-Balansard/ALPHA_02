@@ -10,9 +10,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.setCollideWorldBounds(true)
         this.setGravityY(1200)
-        this.setBodySize(this.body.width, this.body.height + 46);
-        this.setOffset(15, 0)
-        this.scale = 0.9;
+        this.setBodySize(this.body.width, this.body.height+60);
+        this.setOffset(32, 35)
+            //this.scale = 0.9;
         this.doubleJump = false;
         this.jumpCount = 0;
 
@@ -22,40 +22,35 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.anims.create({
             key: 'left',
-            frames: this.anims.generateFrameNumbers('yasuo2', {start: 0, end: 7}),
-            frameRate: 10,
+            frames: this.anims.generateFrameNumbers('persoSprite', {start: 9, end: 0}),
+            frameRate: 15,
             repeat: -1
         });
 
         this.anims.create({
             key: 'right',
-            frames: this.anims.generateFrameNumbers('yasuo2', {start: 9, end: 16}),
-            frameRate: 10,
+            frames: this.anims.generateFrameNumbers('persoSprite', {start: 12, end: 21}),
+            frameRate: 15,
             repeat: -1
         });
 
         this.anims.create({
             key: 'stance',
-            frames: this.anims.generateFrameNumbers('iddle', {start: 0, end: 7}),
-            frameRate: 5,
+            frames: this.anims.generateFrameNumbers('iddlAP', {start: 11, end:22 }),
+            frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
             key: 'back',
-            frames: this.anims.generateFrameNumbers('iddle2', {start: 7, end: 0}),
-            frameRate: 8,
+            frames: this.anims.generateFrameNumbers('iddlAP', {start: 10, end: 0}),
+            frameRate: 10,
 
             repeat: -1
         });
 
-        this.anims.create({
-            key: 'turn',
-            frames: [{key: 'yasuo2', frame: 8}],
-            frameRate: 20
-        });
 
-        this.anims.play('stance');
+       this.anims.play('stance');
         this._directionX = 0;
         this._directionY = 0;
 
@@ -101,16 +96,16 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             default:
                 this.vitesse = 0;
                 this.setVelocityX(0);
-
-                //this.anims.play('turn');
                 this.anims.play(this.sens === -1 ? 'back' : 'stance', true);
+                //this.anims.play('turn');
+
         }
 
         if (this._directionY < 0 && !this.doubleJump) {
 
             this.setVelocityY(-400);
             this.jumpCount += 1;
-            if (!this.body.blocked.down && this.jumpCount >= 10 && !this.doubleJump) {
+            if (!this.body.blocked.down && this.jumpCount >= 20 && !this.doubleJump) {
                 //console.log('hello');
                 this.setVelocityY(-500);
                 this.doubleJump = true;
@@ -233,7 +228,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 });
 
 
-                console.log('dash à gauche');
+                //console.log('dash à gauche');
             } else if (dir > this.posX) {
                 this.scene.tweens.add({
                     targets: this,
@@ -243,7 +238,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 });
 
 
-                console.log('dash à droite');
+                //console.log('dash à droite');
             }
 
         }
@@ -255,7 +250,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         if (this.rechargeSonCoup === false) {
             this.rechargeSonCoup = true;
-            console.log("att 2 sec, je viens de frapper!");
+            //console.log("att 2 sec, je viens de frapper!");
             Tableau.current.epee.setPosition(this.x + (100 * this.sens), this.y);
             setTimeout(function () {
                 Tableau.current.player.estEnTrainDAttaquer = false;
@@ -263,7 +258,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             }, 200);
             setTimeout(function () {
                 Tableau.current.player.rechargeSonCoup = false;
-                console.log("j'ai fini maman");
+                //console.log("j'ai fini maman");
             }, 1500);
         }
     }

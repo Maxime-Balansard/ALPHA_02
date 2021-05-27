@@ -18,25 +18,23 @@ class Tableau extends Phaser.Scene {
 
     preload() {
         this.load.image('Blood', 'assets/Blood.png');
-        this.load.image('ciel', 'assets/ciel.png');
+        //this.load.image('ciel', 'assets/ciel.png');
         this.load.image('rouge', 'assets/rouge.png');
         this.load.audio('piece', 'assets/sounds/piece.mp3');
         this.load.audio('mort', 'assets/sounds/mort.mp3');
         this.load.audio('jojo', 'assets/sounds/jojo.mp3');
 
-        this.load.spritesheet('yasuo2',
-            'assets/yasuo2.png',
-            {frameWidth: 58, frameHeight: 79}
+
+        this.load.spritesheet('persoSprite',
+            'assets/persoSprite.png',
+            {frameWidth: 128, frameHeight: 128}
         );
 
-        this.load.spritesheet('iddle',
-            'assets/iddle.png',
-            {frameWidth: 63, frameHeight: 80}
+        this.load.spritesheet('iddlAP',
+            'assets/iddlAP.png',
+            {frameWidth: 128, frameHeight: 128}
         );
-        this.load.spritesheet('iddle2',
-            'assets/iddle2.png',
-            {frameWidth: 63, frameHeight: 80}
-        );
+
 
     }
 
@@ -68,9 +66,9 @@ class Tableau extends Phaser.Scene {
          * Le ciel en fond
          * @type {Phaser.GameObjects.Image}
          */
-        this.sky = this.add.image(0, 0, 'ciel').setOrigin(0, 0);
-        this.sky.displayWidth = 14 * 64;
-        this.sky.setScrollFactor(0, 0);
+       // this.sky = this.add.image(0, 0, 'ciel').setOrigin(0, 0);
+        //this.sky.displayWidth = 14 * 64;
+       // this.sky.setScrollFactor(0, 0);
         this.epee = new Attack(this, -1000, -1000, 'rouge');
         /**
          * Le joueur
@@ -78,7 +76,7 @@ class Tableau extends Phaser.Scene {
          */
 
 
-        this.player = new Player(this, 800, 400);
+        this.player = new Player(this, 2000, 500);
         this.blood = this.add.sprite(this.sys.canvas.width / 2, this.sys.canvas.height / 2, "Blood")
         this.blood.displayWidth = 64;
         this.blood.displayHeight = 64;
@@ -164,16 +162,20 @@ class Tableau extends Phaser.Scene {
         bonus.disableBody(true, true);
         ui.gagne();
         var cam = this.cameras.main;
-        this.rammasserBonusUn = true;
-        if (this.rammasserBonusUn == true) {
-            //cam.flash(2000, 305, 390, 290);
-            cam.pan(6000, 500, 6000, 'Power2');
+        //this.rammasserBonusUn = true;
+        //if (this.rammasserBonusUn === true) {
+
+            cam.pan(10000, 500, 6000, 'Cubic.easeInOut');
+             this.player.stop();
             cam.zoomTo(0.5, 5000);
-            setTimeout(function () {
+
+            setTimeout(function() {
                 cam.zoomTo(1, 2000);
-            }, 2000)
+
+            }, 6000);
+
         }
-    }
+
 
     /**
      *
@@ -183,7 +185,7 @@ class Tableau extends Phaser.Scene {
 
     etPaf(Attack, monster) {
 
-        console.log("touche");
+       // console.log("touche");
         //this.player.estEnTrainDAttaquer = true;
 
 
