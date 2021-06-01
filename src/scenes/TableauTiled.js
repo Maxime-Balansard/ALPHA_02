@@ -125,6 +125,20 @@ class TableauTiled extends Tableau {
 
 
         });
+
+        this.arrete = this.physics.add.group({
+            allowGravity: false,
+            immovable: true,
+            bounceY: 0
+        });
+        this.arreteObjects = this.map.getObjectLayer('arrete')['objects'];
+        // On crée des étoiles pour chaque objet rencontré
+        this.arreteObjects.forEach(arreteObjects => {
+
+            // Pour chaque étoile on la positionne pour que ça colle bien car les étoiles ne font pas 64x64
+            let arrete = this.arrete.create(arreteObjects.x , arreteObjects.y , 'star');
+
+        });
         //----------les étoiles (objets) ---------------------
 
         // c'est un peu plus compliqué, mais ça permet de maîtriser plus de choses...
@@ -301,7 +315,7 @@ class TableauTiled extends Tableau {
         this.maChute.anims.play('eau',true);
 
 
-        this.pnj=this.add.sprite(2200, 550, 'tutoSaut').setAlpha(0);
+        this.pnj=this.add.sprite(2500, 550, 'tutoSaut').setAlpha(0);
         this.pnj1=this.add.sprite(4100, 550, 'tutoDoubleSaut').setAlpha(0);
         this.pnj2=this.add.sprite(6450, 750, 'tutoDash').setAlpha(0);
        // this.pnj2=this.add.sprite(2200, 650, 'tutoDash1').setAlpha(0);
@@ -443,6 +457,9 @@ doorLight.forEach( p => {
         //si le joueur touche une étoile dans le groupe...
         this.physics.add.overlap(this.player, this.stars, this.ramasserEtoile, null, this);
         this.physics.add.overlap(this.player, this.bonus, this.rammasserBonusUn, null, this);
+
+        this.physics.add.overlap(this.player, this.arrete, this.stoped, null, this);
+
         //quand on touche la lave, on meurt
         this.physics.add.collider(this.player, this.lave, this.hitSpike, null, this);
 
@@ -465,8 +482,6 @@ doorLight.forEach( p => {
         starsFxContainer.setDepth(z--);
         this.devant2.setDepth(z--);
         this.devant.setDepth(z--);
-
-
         this.solides.setDepth(z--);
         this.player.setDepth(z--);
         this.checkPoints.setDepth(z--);
@@ -485,6 +500,8 @@ doorLight.forEach( p => {
         this.sky2.setDepth(z--);
         this.sky.setDepth(z--);
         this.solideMonster.setDepth(z--);
+        this.arrete.setDepth(z--);
+
 
         //on touche un check
 
@@ -498,7 +515,7 @@ doorLight.forEach( p => {
 
     apparitionTexte(){
 
-        if(this.player.x > 1800 && this.isTexte == 0){
+        if(this.player.x > 2100 && this.isTexte == 0){
             this.isTexte++;
             this.tweens.add({
                 targets:this.pnj,

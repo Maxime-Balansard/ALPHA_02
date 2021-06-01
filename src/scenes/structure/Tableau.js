@@ -167,6 +167,17 @@ class Tableau extends Phaser.Scene {
         }
     }
 
+stoped(player, arrete){
+    arrete.disableBody(true, true);
+    this.player.controlLock = true;
+
+
+    let p = this.player;
+    setTimeout(function() {
+        p.controlLock = false;
+    }, 6000);
+}
+
 
     rammasserBonusUn(player, bonus) {
         bonus.disableBody(true, true);
@@ -213,9 +224,9 @@ class Tableau extends Phaser.Scene {
      * @param spike
      */
     hitSpike(player, spike) {
+        console.log('tmort');
         this.physics.pause();
         var cam = this.cameras.main;
-        player.anims.play('turn');
         cam.setZoom(2);
         cam.fadeOut(1000, 0, 0, 0)
         cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {

@@ -15,10 +15,10 @@ class GamePadButtons extends GameKeyboard{
         let btnUP=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
         let btnLEFT=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
         let btnRIGHT=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
-        let btnDASH=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
+        let btnDASH=scene.add.circle(0,0,w/2,0xff2D00,0.5).setInteractive();
 
 
-        let btnA=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
+        let btnA=scene.add.circle(0,0,w/2,0xffffff,0.5).setInteractive();
 
         this.add(btnUP);
         this.add(btnLEFT);
@@ -37,7 +37,7 @@ class GamePadButtons extends GameKeyboard{
         btnDASH.y=w*2;
 
         btnA.x=scene.sys.canvas.width * -1 + w * 4;
-        btnA.y=w*1;
+        btnA.y=w*0;
 
 
         btnLEFT.on('pointerdown',function(){

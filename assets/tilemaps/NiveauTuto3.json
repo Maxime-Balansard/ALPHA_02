@@ -221,6 +221,29 @@
         }, 
         {
          "draworder":"topdown",
+         "id":17,
+         "name":"arrete",
+         "objects":[
+                {
+                 "gid":1381,
+                 "height":32,
+                 "id":79,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":2073.33333333333,
+                 "y":728.666666666667
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":15,
          "name":"lights",
          "objects":[],
@@ -244,7 +267,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":1668,
+                 "x":1669,
                  "y":677
                 }],
          "opacity":1,
@@ -287,8 +310,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":17,
- "nextobjectid":79,
+ "nextlayerid":18,
+ "nextobjectid":81,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.2",
