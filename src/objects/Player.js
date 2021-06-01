@@ -9,12 +9,15 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.rechargeSonCoup = false;
 
         this.setCollideWorldBounds(true)
-        this.setGravityY(1200)
+        this.setGravityY(1500)
         this.setBodySize(this.body.width, this.body.height+60);
         this.setOffset(32, 35)
             //this.scale = 0.9;
+        this.simpleJump = false;
         this.doubleJump = false;
-        this.jumpCount = 0;
+        this.waitForDoubleJump = false;
+        this.controlLock= false;
+        this.isDash = false;
 
         this.speedFactor = 1;
         this.vitesse = 0;
@@ -36,7 +39,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.anims.create({
             key: 'stance',
-            frames: this.anims.generateFrameNumbers('iddlAP', {start: 11, end:22 }),
+            frames: this.anims.generateFrameNumbers('iddlAP', {start: 11, end:21 }),
             frameRate: 10,
             repeat: -1
         });
@@ -47,6 +50,30 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             frameRate: 10,
 
             repeat: -1
+        });
+
+        this.anims.create({
+            key: 'dash01',
+            frames: this.anims.generateFrameNumbers('dash1.0', {start: 0, end:1 }),
+            frameRate: 10
+        });
+
+        this.anims.create({
+            key: 'dash02',
+            frames: this.anims.generateFrameNumbers('dash2.0', {start: 1, end:0 }),
+            frameRate: 10
+        });
+
+        this.on('animationcomplete',function () {
+            if(this.anims.currentAnim.key === 'dash01'){
+                this.isDash= false;
+            }
+        });
+
+        this.on('animationcomplete',function () {
+            if(this.anims.currentAnim.key === 'dash02'){
+                this.isDash= false;
+            }
         });
 
 
@@ -77,22 +104,35 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     move() {
 
-        //this.sens=1;
         this.body.velocity.y = Math.min(800, Math.max(-800, this.body.velocity.y));
 
+    if(this.isDash){
+        if(this.sens === 1){
+            this.anims.play('dash01', true);
+        }else if (this.sens === -1)
+            this.anims.play('dash02', true);
+    }
+
+        if (!this.controlLock){
         switch (true) {
             case this._directionX < 0:
                 this.sens = -1;
                 this.setVelocityX(this.sens * 240 * this.speedFactor);
                 this.vitesse = 1;
+                if(!this.isDash ){
                 this.anims.play('left', true);
+                }
                 break;
             case this._directionX > 0:
                 this.sens = 1;
                 this.setVelocityX(this.sens * 240 * this.speedFactor);
                 this.vitesse = 1;
+                if(!this.isDash ){
                 this.anims.play('right', true);
+                }
                 break;
+
+
             default:
                 this.vitesse = 0;
                 this.setVelocityX(0);
@@ -101,95 +141,69 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         }
 
-        if (this._directionY < 0 && !this.doubleJump) {
+        if (this.body.blocked.down)
+        {
+            this.simpleJump = false;
+            this.doubleJump = false;
+            this.waitForDoubleJump = false;
 
-            this.setVelocityY(-400);
-            this.jumpCount += 1;
-            if (!this.body.blocked.down && this.jumpCount >= 20 && !this.doubleJump) {
-                //console.log('hello');
-                this.setVelocityY(-500);
-                this.doubleJump = true;
+
+            if (this._directionY < 0)
+            {
+                   // console.log('saut');
+                    this.setVelocityY(-600);
+                    this.simpleJump = true;
+            }
+        }
+        else
+        {
+            if (this.simpleJump && this._directionY>=0)
+            {
+                this.waitForDoubleJump = true;
             }
 
+            if (this._directionY < 0 && this.waitForDoubleJump) {
+                //console.log("je veux sauter");
+                if (this.simpleJump && !this.doubleJump) {
+                    //console.log('double saut');
+                    this.setVelocityY(-600);
+                    this.doubleJump = true;
+                }
+            }
         }
+        }else{
+            this.setVelocityX(0);
+            this.anims.play('stance', true);
+
+
+        }
+
+
+
         //console.log(this.jumpCount);
         //console.log(this.doubleJump);
 
-
-        if (this.body.blocked.down) {
-            this.doubleJump = false;
-            this.jumpCount = 0;
-        }
 
 
     }
 
 
-    /*dash(){
-        console.log('coucou');
 
-       this.setTint(0xff0000);
-
-       let direction = -1;
-
-       Tableau.current.tweens.timeline({
-           targets: Tableau.current.player.body.velocity,
-           ease: 'Circ.easeInOut',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
-           duration: 50,
-           loop: 0,
-           tweens: [
-               {
-                   targets: Tableau.current.player.body.velocity,
-                   x: 3000 *direction
-               },
-               {
-                   targets: Tableau.current.player.body.velocity,
-                   x: 0
-               }
-           ]
-       });
-
-       /**this.posX = this.x;
-       this.posY = this.y;
-       var direct;
-
-
-       this.scene.cameras.main.shake(200,0.004,true,);
-
-       if (this._directionX < 0 || this.sens===-1) {
-           direct = this.posX - 5;
-       } else if (this._directionX > 0 || this.sens===1) {
-           direct = this.posX + 5;
-       }
-       if (direct < this.posX) {
-           this.animGauche();
-       } else if (direct > this.posX) {
-           this.animDroite();
-       }*/
-
-
-    /* animDroite(){
-         console.log('dash droite')
-
-
-
-
-   }*/
 
 
     dash() {
+   this.isDash = true;
 
         //permet de dasher en étant immobile
         if (this.rechargeSonCoup === false) {
-            Tableau.current.cameras.main.flash(500);
+            Tableau.current.cameras.main.shake(70,0.084);
             this._directionX = this.sens;
             this.speedFactor = 1;
             this.speedFactorMax = 1;
-
-
             if (this.speedFactor >= this.speedFactorMax) {
                 this.speedFactor = 1;
             }
+
 
             let me = this;
 
@@ -215,8 +229,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
             if (this._directionX < 0 || this.sens === -1) { //sens===-1 pour dasher dans le sens ou on regarde quand on est immobile
                 dir = this.posX - 5;
+
             } else if (this._directionX > 0 || this.sens === 1) {
                 dir = this.posX + 5;
+
             }
 
             if (dir < this.posX) {
@@ -228,6 +244,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 });
 
 
+
                 //console.log('dash à gauche');
             } else if (dir > this.posX) {
                 this.scene.tweens.add({
@@ -236,7 +253,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                     ease: 'Circ.easeInOut',
                     duration: 100,
                 });
-
 
                 //console.log('dash à droite');
             }
@@ -259,7 +275,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             setTimeout(function () {
                 Tableau.current.player.rechargeSonCoup = false;
                 //console.log("j'ai fini maman");
-            }, 1500);
+            }, 500);
         }
     }
 

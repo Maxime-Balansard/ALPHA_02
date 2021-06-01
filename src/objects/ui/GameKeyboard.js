@@ -6,7 +6,6 @@ class GameKeyboard extends Phaser.GameObjects.Container{
         super(scene, x, y)
         scene.add.existing(this);
 
-     
        /* this.KeyDash = this.input.keyboard.addKey('SPACE');
 
         if (Phaser.Input.Keyboard.JustDown(this.KeyDash)){
@@ -50,9 +49,10 @@ class GameKeyboard extends Phaser.GameObjects.Container{
                     Tableau.current.player.directionY=1;
                     break;
 
-                case "Shift":
+                case " ":
+                    Tableau.current.player.dash();
                     Tableau.current.player.attaque();
-                    console.log("shifton");
+                    console.log('spaceOf')
                     break;
                 
                 }
@@ -81,11 +81,7 @@ class GameKeyboard extends Phaser.GameObjects.Container{
                     Tableau.current.player.directionY=0;
                     break;
 
-                case " ":
-                    Tableau.current.player.dash();
-                    Tableau.current.player.attaque();
-                    console.log('spaceOf')
-                    break;
+
 
 
             }

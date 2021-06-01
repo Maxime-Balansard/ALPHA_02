@@ -13,10 +13,24 @@ class TableauTiled extends Tableau {
         this.load.image('tiles', 'assets/tilemaps/SpriteSheet.png');
         this.load.image('plat128', 'assets/plat128.png');
         this.load.image('oni', 'assets/oni.png');
+        this.load.image('plat64', 'assets/plat64.png');
         this.load.image('star', 'assets/piece.png');
+        this.load.image('chek1', 'assets/chek.png');
         this.load.image('logo1', 'assets/logo1.png');
-        this.load.image('rouge', 'assets/rouge.png');
+
+       // this.load.image('rouge', 'assets/rouge.png');
         this.load.image('rose', 'assets/rose.png');
+
+        this.load.image('orange', 'assets/sparkOrange.png');
+        this.load.image('rougeF', 'assets/sparkRougeF.png');
+        this.load.image('jaune', 'assets/sparkJaune.png');
+        this.load.image('rouge', 'assets/spark.png');
+
+        this.load.image('tutoDash', 'assets/tutoDash1.png');
+        this.load.image('tutoDoubleSaut', 'assets/tutoDoubleSaut1.png');
+        this.load.image('tutoSaut', 'assets/tutoSaut1.png');
+
+
 
         this.load.image('test', 'assets/test.jpg');
 
@@ -30,9 +44,11 @@ class TableauTiled extends Tableau {
         this.load.atlas('particles', 'assets/particles/particles.png', 'assets/particles/particles.json');
 
 
-        this.load.spritesheet('chuteO',
-            'assets/chute.png',
-            {frameWidth: 32, frameHeight: 94}
+
+
+        this.load.spritesheet('chute1',
+            'assets/chuteGR.png',
+            {frameWidth: 192, frameHeight: 640}
         );
     }
 
@@ -41,7 +57,10 @@ class TableauTiled extends Tableau {
         super.create();
         //on en aura besoin...
         let ici = this;
-
+        this.isTexte = 0;
+        this.isTexte1 =0;
+        var cam = this.cameras.main;
+        //this.isTexte1 = 0;
         //video
 
 
@@ -62,6 +81,7 @@ class TableauTiled extends Tableau {
         //---- ajoute les plateformes simples ----------------------------
         this.solides = this.map.createLayer('solides', this.tileset, 0, 0);
         this.lave = this.map.createLayer('lave', this.tileset, 0, 0);
+        //this.light = this.map.createLayer('light', this.tileset, 0, 0);
         this.derriere3 = this.map.createLayer('derriere3', this.tileset, 0, 0);
         this.derriere1 = this.map.createLayer('derriere1', this.tileset, 0, 0);
         this.derriere2 = this.map.createLayer('derriere2', this.tileset, 0, 0);
@@ -74,6 +94,15 @@ class TableauTiled extends Tableau {
         this.lave.setCollisionByExclusion(-1, true);
         this.solides.setCollisionByExclusion(-1, true);
 
+
+
+        this.plightContainer=this.add.container();
+        ici.plight = ici.map.getObjectLayer('lights')['objects'];
+        ici.plight.forEach(plightObjects => {
+            let light = new Light(this,plightObjects.x+16,plightObjects.y-10).setDepth(9999);
+            light.addLight(this,255,100,100, 100, 0.5, 0.04,false);
+            this.plightContainer.add(light);
+        });
         //----------------bonus 1------------------------
         this.bonus = this.physics.add.group({
             allowGravity: false,
@@ -129,7 +158,7 @@ class TableauTiled extends Tableau {
         //on crée des checkpoints pour chaque objet rencontré
         this.checkPointsObjects.forEach(checkPointObject => {
             console.log('chekPointObject', checkPointObject);
-            let point = this.checkPoints.create(checkPointObject.x, checkPointObject.y, 'star');
+            let point = this.checkPoints.create(checkPointObject.x, checkPointObject.y, 'chek1');
             point.checkPointObject = checkPointObject;
         });
 
@@ -248,25 +277,31 @@ class TableauTiled extends Tableau {
 
 
 
+
+
+
         this.sky.setOrigin(0, 0);
         this.sky2.setOrigin(0, 0);
         this.sky.setScrollFactor(0);//fait en sorte que le ciel ne suive pas la caméra
         this.sky2.setScrollFactor(0);//fait en sorte que le ciel ne suive pas la caméra
 
 
+
         this.anims.create({
             key: 'eau',
-            frames: this.anims.generateFrameNumbers('chuteO', {start: 0, end:3 }),
+            frames: this.anims.generateFrameNumbers('chute1', {start: 0, end:7 }),
             frameRate: 10,
             repeat: -1
         });
 
-        this.maChute= this.add.sprite(2000, 500, 'chuteO').play('chute', true).setDepth(99999);
+        this.maChute= this.add.sprite(3460, 750, 'chute1').play('chute1', true).setDepth(999999);
 
         this.maChute.anims.play('eau',true);
 
 
-        //this.add.sprite(2000, 500, 'oni');
+        this.pnj=this.add.sprite(2200, 550, 'tutoSaut').setAlpha(0);
+        this.pnj1=this.add.sprite(4100, 550, 'tutoDoubleSaut').setAlpha(0).setDepth(99999999);
+       // this.pnj2=this.add.sprite(2200, 650, 'tutoDash1').setAlpha(0);
 
        /* let logo1 = this.add.image(200, 500, 'logo1');
 
@@ -303,7 +338,94 @@ class TableauTiled extends Tableau {
             //blendMode: 'ADD',
             emitZone: {source: rect1}
         });*/
+
+
         //----exemple pou faire ensorte qu'un image appraisse quand on aprroche ou non
+let doorLight = [];
+ doorLight[0]= this.add.pointlight(9560,200,0,250,0.3).setDepth(9999999);
+ doorLight[1]= this.add.pointlight(9560,280,0,250,0.3).setDepth(9999999);
+ doorLight[2]= this.add.pointlight(9560,360,0,250,0.3).setDepth(9999999);
+doorLight.forEach( p => {
+    p.attenuation = 0.05;
+    p.color.setTo(255,100,100);
+
+        this.tweens.add({
+            targets:p,
+            duration:2000,
+            repeat:-1,
+            yoyo: true,
+            delay:1000,
+            alpha:{
+                startdeDelay:0,
+                from:0.5,
+                to:1
+            }
+        })
+    })
+
+   /* if(this.player.x > 8700){
+
+        cam.zoomTo(0.5,2000);
+    }*/
+
+
+
+        var particles2 = this.add.particles('jaune');
+        var rect = new Phaser.Geom.Rectangle(9500, 150, 50, 150);
+        particles2.createEmitter({
+            x: 50, y: 100,
+            moveToX: {min: 9000, max: 8000},
+            moveToY: {min: 100, max: 400},
+            rotate: {min: -10, max: 360},
+            lifespan: 5000,
+             alpha:0.5,
+            quantity: 2,
+            frequency: 200,
+            delay: 100,
+            depth: 10,
+            scale: {start: 1.5, end: 0.2},
+            //blendMode: 'ADD',
+            emitZone: {source: rect}
+        });
+
+
+        var particles3 = this.add.particles('rouge');
+        var rect = new Phaser.Geom.Rectangle(9500, 150, 50, 150);
+        particles3.createEmitter({
+            x: 50, y: 50,
+            moveToX: {min: 9000, max: 8500},
+            moveToY: {min: 100, max: 400},
+            rotate: {min: -10, max: 360},
+            lifespan: 4000,
+             alpha:0.5,
+            quantity: 2,
+            frequency: 200,
+            delay: 100,
+            depth: 10,
+            scale: {start: 1.5, end: 0.2},
+            //blendMode: 'ADD',
+            emitZone: {source: rect}
+        });
+
+       var particles4 = this.add.particles('rougeF');
+        var rect = new Phaser.Geom.Rectangle(9500, 150, 50, 150);
+        particles4.createEmitter({
+            x: 50, y: 100,
+            moveToX: {min: 9000, max: 8800},
+            moveToY: {min: 100, max: 400},
+            rotate: {min: -10, max: 360},
+            lifespan: 2000,
+             alpha:0.5,
+            quantity: 1,
+            frequency: 200,
+            delay: 100,
+            depth: 10,
+            scale: {start: 1.5, end: 0.5},
+            //blendMode: 'ADD',
+            emitZone: {source: rect}
+        });
+
+
 
 
         //----------collisions---------------------
@@ -326,7 +448,7 @@ class TableauTiled extends Tableau {
         let z = 1000; //niveau Z qui a chaque fois est décrémenté.
         debug.setDepth(z--);
 
-        this.checkPoints.setDepth(z--);
+
         this.blood.setDepth(z--);
         monstersContainer.setDepth(z--);
         monstersContainer1.setDepth(z--);
@@ -335,14 +457,23 @@ class TableauTiled extends Tableau {
         particles2.setDepth(z--);*/
         this.stars.setDepth(z--);
         this.bonus.setDepth(z--);
+        //this.pnj1.setDepth(z--);
         starsFxContainer.setDepth(z--);
         this.devant2.setDepth(z--);
         this.devant.setDepth(z--);
+
+
         this.solides.setDepth(z--);
+        this.player.setDepth(z--);
+        this.checkPoints.setDepth(z--);
+        this.pnj.setDepth(z--);
+        //this.pnj1.setDepth(z--);
         this.laveFxContainer.setDepth(z--);
         this.lave.setDepth(z--);
-        this.player.setDepth(z--);
         this.derriere.setDepth(z--);
+        particles2.setDepth(z--);
+        particles3.setDepth(z--);
+        particles4.setDepth(z--);
         this.derriere1.setDepth(z--);
         this.derriere2.setDepth(z--);
         this.derriere3.setDepth(z--);
@@ -358,30 +489,70 @@ class TableauTiled extends Tableau {
     }
 
 
-    /*
-        apparitionTexte(){
 
-            if(this.player.x<1900){
-                //this.tuto_dash.alpha=1;
-                Tableau.current.tweens.add({
-                    targets: Tableau.current.oni,
-                    alpha:1,
-                    duration: 100,
-                    ease: 'Sine.easeInOut',
+    apparitionTexte(){
 
-                })
-            }else if(this.player.x>=2100){
-                //this.tuto_dash.alpha=0;
-                Tableau.current.tweens.add({
-                    targets: Tableau.current.oni,
-                    alpha:0,
-                    duration: 100,
-                    ease: 'Sine.easeInOut',
-
-                })
-            }
+        if(this.player.x > 1800 && this.isTexte == 0){
+            this.isTexte++;
+            this.tweens.add({
+                targets:this.pnj,
+                duration:3000,
+                yoyo: false,
+                delay:200,
+                alpha:{
+                    startDelay:0,
+                    from:0,
+                    to:1
+                }
+            })
+        }else if (this.player.x > 3000 && this.isTexte == 1){
+            this.isTexte++;
+            this.tweens.add({
+                targets:this.pnj,
+                duration:3000,
+                yoyo: false,
+                delay:200,
+                alpha:{
+                    startDelay:0,
+                    from:1,
+                    to:0
+                }
+            })
         }
-    */
+
+    }
+
+   apparitionTexte1(){
+
+        if(this.player.x > 3600 && this.isTexte1 == 0){
+            this.isTexte1++;
+            this.tweens.add({
+                targets:this.pnj1,
+                duration:3000,
+                yoyo: false,
+                delay:200,
+                alpha:{
+                    startDelay:0,
+                    from:0,
+                    to:1
+                }
+            })
+        }else if (this.player.x > 5000 && this.isTexte1 == 1){
+            this.isTexte1++;
+            this.tweens.add({
+                targets:this.pnj1,
+                duration:3000,
+                yoyo: false,
+                delay:200,
+                alpha:{
+                    startDelay:0,
+                    from:1,
+                    to:0
+                }
+            })
+        }
+    }
+
 
 
     /**
@@ -447,13 +618,15 @@ class TableauTiled extends Tableau {
         this.sky2.tilePositionX = this.cameras.main.scrollX * 0.7 + 100;
         this.sky2.tilePositionY = this.cameras.main.scrollY * 0.7 + 100;
 
+
     }
 
 
     update() {
         super.update();
         this.moveParallax();
-
+        this.apparitionTexte();
+        this.apparitionTexte1();
         //optimisation
         //teste si la caméra a bougé
         let actualPosition = JSON.stringify(this.cameras.main.worldView);

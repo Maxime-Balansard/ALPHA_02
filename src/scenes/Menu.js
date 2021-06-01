@@ -14,7 +14,9 @@ class Menu extends Phaser.Scene {
   
     create()
     {
-        
+
+        var cam = this.cameras.main;
+        cam.zoomTo(0.5);
 
      
 
