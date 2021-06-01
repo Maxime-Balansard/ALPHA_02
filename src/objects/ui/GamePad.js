@@ -4,8 +4,10 @@
 
  class GamePad extends Phaser.GameObjects.Container{
     constructor(scene, x, y,size=100) {
+
         super(scene, x, y)
         scene.add.existing(this);
+        game.input.addPointer(3);
 
         this.size=size;
         let w=this.size;

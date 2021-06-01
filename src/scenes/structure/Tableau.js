@@ -84,7 +84,7 @@ class Tableau extends Phaser.Scene {
          */
 
 
-        this.player = new Player(this, 3500, 300);
+        this.player = new Player(this, 1400, 300);
         this.blood = this.add.sprite(this.sys.canvas.width / 2, this.sys.canvas.height / 2, "Blood")
         this.blood.displayWidth = 64;
         this.blood.displayHeight = 64;

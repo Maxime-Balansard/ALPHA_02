@@ -59,6 +59,7 @@ class TableauTiled extends Tableau {
         let ici = this;
         this.isTexte = 0;
         this.isTexte1 =0;
+        this.isTexte2 =0;
         var cam = this.cameras.main;
         //this.isTexte1 = 0;
         //video
@@ -80,6 +81,7 @@ class TableauTiled extends Tableau {
 
         //---- ajoute les plateformes simples ----------------------------
         this.solides = this.map.createLayer('solides', this.tileset, 0, 0);
+        this.solideMonster = this.map.createLayer('solideMonster', this.tileset, 0, 0);
         this.lave = this.map.createLayer('lave', this.tileset, 0, 0);
         //this.light = this.map.createLayer('light', this.tileset, 0, 0);
         this.derriere3 = this.map.createLayer('derriere3', this.tileset, 0, 0);
@@ -93,10 +95,15 @@ class TableauTiled extends Tableau {
 
         this.lave.setCollisionByExclusion(-1, true);
         this.solides.setCollisionByExclusion(-1, true);
+        this.solideMonster.setCollisionByExclusion(-1, true);
+        //this.solideMonster.setCollisionByProperty({collides:true});
+
 
 
 
         this.plightContainer=this.add.container();
+        this.monstersContainer=this.add.container();
+
         ici.plight = ici.map.getObjectLayer('lights')['objects'];
         ici.plight.forEach(plightObjects => {
             let light = new Light(this,plightObjects.x+16,plightObjects.y-10).setDepth(9999);
@@ -132,24 +139,19 @@ class TableauTiled extends Tableau {
             // Pour chaque étoile on la positionne pour que ça colle bien car les étoiles ne font pas 64x64
             let star = this.stars.create(starObject.x + 32, starObject.y + 32, 'particles', 'star');
         });
-        //----------les monstres volants (objets tiled) ---------------------
 
-        let monstersContainer = this.add.container();
-        this.flyingMonstersObjects = this.map.getObjectLayer('flyingMonsters')['objects'];
+
+        ici.OniObjects = ici.map.getObjectLayer('Oni')['objects'];
         // On crée des montres volants pour chaque objet rencontré
-        this.flyingMonstersObjects.forEach(monsterObject => {
-            let monster = new MonsterFly(this, monsterObject.x, monsterObject.y);
-            monstersContainer.add(monster);
-        });
-        //-----------------oni----------------------
-        let monstersContainer1 = this.add.container();
-        this.oniObjects = this.map.getObjectLayer('oni')['objects'];
-        // On crée des zombies pour chaque objet rencontré
-        this.oniObjects.forEach(monsterObject => {
-            let monster = new MonsterSol(this, monsterObject.x, monsterObject.y);
-            monstersContainer1.add(monster);
+        ici.OniObjects.forEach(monsterObject => {
+            let monster=new Oni(this,monsterObject.x,monsterObject.y);
+            this.monstersContainer.add(monster);
+            this.physics.add.collider(monster, this.solides);
+            this.physics.add.collider(monster, this.solideMonster);
 
         });
+
+
 
 
         //check c fait ---------------------------------
@@ -300,7 +302,8 @@ class TableauTiled extends Tableau {
 
 
         this.pnj=this.add.sprite(2200, 550, 'tutoSaut').setAlpha(0);
-        this.pnj1=this.add.sprite(4100, 550, 'tutoDoubleSaut').setAlpha(0).setDepth(99999999);
+        this.pnj1=this.add.sprite(4100, 550, 'tutoDoubleSaut').setAlpha(0);
+        this.pnj2=this.add.sprite(6450, 750, 'tutoDash').setAlpha(0);
        // this.pnj2=this.add.sprite(2200, 650, 'tutoDash1').setAlpha(0);
 
        /* let logo1 = this.add.image(200, 500, 'logo1');
@@ -432,7 +435,8 @@ doorLight.forEach( p => {
 
         //quoi collide avec quoi?
         //this.physics.add.collider(this.platforms, this.stars);
-        this.physics.add.collider(this.player, this.platforms);
+
+
         this.physics.add.collider(this.player, this.solides);
         this.physics.add.collider(this.stars, this.solides);
         this.physics.add.collider(this.bonus, this.solides);
@@ -450,12 +454,12 @@ doorLight.forEach( p => {
 
 
         this.blood.setDepth(z--);
-        monstersContainer.setDepth(z--);
-        monstersContainer1.setDepth(z--);
+        //monstersContainer.setDepth(z--);
        /* logo1.setDepth(z--);
         particles1.setDepth(z--);
         particles2.setDepth(z--);*/
         this.stars.setDepth(z--);
+        this.monstersContainer.setDepth(z--);
         this.bonus.setDepth(z--);
         //this.pnj1.setDepth(z--);
         starsFxContainer.setDepth(z--);
@@ -467,7 +471,8 @@ doorLight.forEach( p => {
         this.player.setDepth(z--);
         this.checkPoints.setDepth(z--);
         this.pnj.setDepth(z--);
-        //this.pnj1.setDepth(z--);
+        this.pnj1.setDepth(z--);
+        this.pnj2.setDepth(z--);
         this.laveFxContainer.setDepth(z--);
         this.lave.setDepth(z--);
         this.derriere.setDepth(z--);
@@ -479,6 +484,7 @@ doorLight.forEach( p => {
         this.derriere3.setDepth(z--);
         this.sky2.setDepth(z--);
         this.sky.setDepth(z--);
+        this.solideMonster.setDepth(z--);
 
         //on touche un check
 
@@ -541,6 +547,38 @@ doorLight.forEach( p => {
             this.isTexte1++;
             this.tweens.add({
                 targets:this.pnj1,
+                duration:3000,
+                yoyo: false,
+                delay:200,
+                alpha:{
+                    startDelay:0,
+                    from:1,
+                    to:0
+                }
+            })
+        }
+    }
+
+
+    apparitionTexte2(){
+
+        if(this.player.x > 6100 && this.isTexte2 == 0){
+            this.isTexte2++;
+            this.tweens.add({
+                targets:this.pnj2,
+                duration:3000,
+                yoyo: false,
+                delay:200,
+                alpha:{
+                    startDelay:0,
+                    from:0,
+                    to:1
+                }
+            })
+        }else if (this.player.x > 7000 && this.isTexte2 == 1){
+            this.isTexte2++;
+            this.tweens.add({
+                targets:this.pnj2,
                 duration:3000,
                 yoyo: false,
                 delay:200,
@@ -627,6 +665,7 @@ doorLight.forEach( p => {
         this.moveParallax();
         this.apparitionTexte();
         this.apparitionTexte1();
+        this.apparitionTexte2();
         //optimisation
         //teste si la caméra a bougé
         let actualPosition = JSON.stringify(this.cameras.main.worldView);
