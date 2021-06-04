@@ -4,7 +4,7 @@ class Attack extends ObjetPhysique{
 
 
         //this.setOrigin(0,0);
-        this.setDisplaySize(100,30);
+        this.setDisplaySize(100,60);
         this.setCollideWorldBounds(false);
         this.body.allowGravity=false;
         this.setDepth(1000);

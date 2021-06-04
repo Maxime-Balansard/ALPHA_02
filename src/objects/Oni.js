@@ -19,7 +19,7 @@ class Oni extends ObjetEnnemi{
         this.setCollideWorldBounds(true);
         this.setBounce(0);
 
-        this.setDepth(102);
+
         scene.time.addEvent({ delay: 100, callback: this.mouv, callbackScope: this, loop: true });
 
     }

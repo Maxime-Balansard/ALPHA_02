@@ -6,24 +6,24 @@ class MonsterSol extends ObjetEnnemi{
      * @param y
      */
     constructor(scene, x, y) {
-        super(scene, x, y, "oni");
+        super(scene, x, y, "caillou1");
         //pas de gravité
         this.body.allowGravity=false;
         this.setCollideWorldBounds(true);
-        this.setBodySize(this.body.width-20,this.body.height-15);
-        this.setDepth(10);
+        this.disableBody(true, false);
+        this.setBodySize(this.body.width,this.body.height);
         this.scene.events.on('update', (time, delta) => { this.update(time, delta)} );
 //définir les propriété que l'on va utiliser dans notre animation
 
         // X
         this.originalX=x;
-        this.minX=x-20;
-        this.maxX=x+650;
+        this.minX=x;
+        this.maxX=x;
 
         // Y
         this.originalY=y;
-        this.minY=y -64;
-        this.maxY=height-128;
+        this.minY=y ;
+        this.maxY=y-20;
 
         // on applique les propriété du début de l'animation
         this.x=this.minX;
@@ -52,27 +52,16 @@ class MonsterSol extends ObjetEnnemi{
     start(){
         this.scene.tweens.add({
             targets: this,
-            x: {
-                from: this.minX,
-                to:this.maxX,
-                duration: 5000,
-                ease: 'Circ.easeInOut',
+            y: {
+                from: this.minY,
+                to:this.maxY,
+                duration: 2000,
+                ease: 'Quad.easeInOut',
                 yoyo: -1,
-                repeat:-1, 
-                hold:1500,
+                repeat:-1,
+                //hold:1500,
             }
         });
-    }
-    update(){
-        
-        if(this.body){
-            if(this.body.velocity.x<0){
-                this.flipX=false;
-            }else{
-                this.flipX=true;
-            }
-        }
-
     }
 
 

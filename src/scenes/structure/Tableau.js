@@ -23,6 +23,7 @@ class Tableau extends Phaser.Scene {
         this.load.audio('piece', 'assets/sounds/piece.mp3');
         this.load.audio('mort', 'assets/sounds/mort.mp3');
         this.load.audio('jojo', 'assets/sounds/jojo.mp3');
+        this.load.audio('paf', 'assets/sounds/dash.mp3');
 
 
         this.load.spritesheet('persoSprite',
@@ -47,11 +48,11 @@ class Tableau extends Phaser.Scene {
     }
 
     create() {
-        this.jumpCount = 0;
         //musique
         this.mort = this.sound.add('mort');
         this.jojo = this.sound.add('jojo');
         this.piece = this.sound.add('piece');
+        this.paf = this.sound.add('paf');
 
         var musicConfig = {
             mute: false,
@@ -84,7 +85,7 @@ class Tableau extends Phaser.Scene {
          */
 
 
-        this.player = new Player(this, 1400, 300);
+        this.player = new Player(this, 9300, 200);
         this.blood = this.add.sprite(this.sys.canvas.width / 2, this.sys.canvas.height / 2, "Blood")
         this.blood.displayWidth = 64;
         this.blood.displayHeight = 64;
@@ -96,6 +97,8 @@ class Tableau extends Phaser.Scene {
     update() {
         super.update();
         this.player.move();
+
+
 
 
     }
@@ -139,8 +142,6 @@ class Tableau extends Phaser.Scene {
     ramasserEtoile(player, star) {
         star.disableBody(true, true);
         ui.gagne();
-
-
         //va lister tous les objets de la scène pour trouver les étoies et vérifier si elles sont actives
         let totalActive = 0;
         for (let child of this.children.getChildren()) {
@@ -148,34 +149,30 @@ class Tableau extends Phaser.Scene {
                 if (child.active) {
                     totalActive++;
 
-                    var musicConfig = {
-                        mute: false,
-                        volume: 0.01,
-                        rate: 1,
-                        detune: 0,
-                        seek: 0,
-                        loop: false,
-                        delay: 0
-                    }
-
-                    this.piece.play(musicConfig);
                 }
             }
         }
         if (totalActive === 0) {
-            this.win();
+                this.win();
         }
+
+    }
+
+
+    rammasse(player, pierre) {
+        pierre.disableBody(true, true);
+        ui.gagne();
+    }
+
+    rammasseUn(player, pierreUn) {
+        pierreUn.disableBody(true, true);
+        ui.gagne();
     }
 
 stoped(player, arrete){
     arrete.disableBody(true, true);
-    this.player.controlLock = true;
-
-
-    let p = this.player;
-    setTimeout(function() {
-        p.controlLock = false;
-    }, 6000);
+    var cam = this.cameras.main;
+    cam.fadeOut(1000, 255, 100, 100)
 }
 
 
@@ -186,7 +183,7 @@ stoped(player, arrete){
         //this.rammasserBonusUn = true;
         //if (this.rammasserBonusUn === true) {
         this.player.controlLock = true;
-            cam.pan(10000, 500, 6000, 'Cubic.easeInOut');
+            cam.pan(10000, 500, 6000, 'Quad.easeInOut');
 
             cam.zoomTo(0.5, 5000);
 
@@ -206,17 +203,14 @@ stoped(player, arrete){
      */
 
     etPaf(Attack, monster) {
-
        // console.log("touche");
         //this.player.estEnTrainDAttaquer = true;
-
-
         monster.isDead = true; //ok le monstre est mort
         monster.disableBody(true, true);//plus de collisions
         this.cameras.main.shake(200, 0.006, true,); //Screen Shaker
-
-
     }
+
+
 
     /**
      * Aïeee ça fait mal

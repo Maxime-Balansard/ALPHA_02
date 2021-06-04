@@ -194,9 +194,11 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     dash() {
    this.isDash = true;
 
+
+
         //permet de dasher en étant immobile
         if (this.rechargeSonCoup === false) {
-            Tableau.current.cameras.main.shake(70,0.084);
+            Tableau.current.cameras.main.shake(70,0.020);
             this._directionX = this.sens;
             this.speedFactor = 1;
             this.speedFactorMax = 1;
@@ -254,6 +256,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                     duration: 100,
                 });
 
+
                 //console.log('dash à droite');
             }
 
@@ -267,7 +270,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.rechargeSonCoup === false) {
             this.rechargeSonCoup = true;
             //console.log("att 2 sec, je viens de frapper!");
-            Tableau.current.epee.setPosition(this.x + (100 * this.sens), this.y);
+            Tableau.current.epee.setPosition(this.x + (100 * this.sens), this.y+40 );
             setTimeout(function () {
                 Tableau.current.player.estEnTrainDAttaquer = false;
                 Tableau.current.epee.setPosition(-1000, -1000);

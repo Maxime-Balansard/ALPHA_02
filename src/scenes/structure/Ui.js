@@ -8,7 +8,7 @@ class Ui extends Phaser.Scene{
         this.load.image('ui/full-screen-icon', 'assets/ui/full-screen.png');
     }
     create (){
-        console.log("create Ui")
+       // console.log("create Ui")
 
         this.score=0;
         /**
@@ -16,7 +16,7 @@ class Ui extends Phaser.Scene{
          * @type {Phaser.GameObjects.Text}
          * @private
          */
-        this._scoreText = this.add.text(16, 16, '...', {
+        this._scoreText = this.add.text(10, 10, '', {
             font:'32px "Hanalei Fill"',
             fill: '#fff'
         });
@@ -26,7 +26,7 @@ class Ui extends Phaser.Scene{
          * @type {Phaser.GameObjects.Text}
          * @private
          */
-        this._tableauText = this.add.text(this.sys.canvas.width-16, 16, '...', {
+        this._tableauText = this.add.text(this.sys.canvas.width-10, 10, '', {
             font:'32px "Hanalei Fill"',
             align: 'right',
             fill: '#fff'
@@ -37,7 +37,7 @@ class Ui extends Phaser.Scene{
          * @type {Phaser.GameObjects.Text}
          * @private
          */
-        this._tableauTextClass = this.add.text(this.sys.canvas.width-16, 16+32, '...', {
+        this._tableauTextClass = this.add.text(this.sys.canvas.width-10, 10+32, '', {
             font:'24px "Hanalei Fill"',
             align: 'right',
             fill: '#fff',
@@ -93,12 +93,12 @@ class Ui extends Phaser.Scene{
     gagne(points=10)
     {
         this.score+=points;
-        this._scoreText.setText('Score: ' + this.score);
+       // this._scoreText.setText();
     }
     update(){
         if(Tableau.current){
-            this._tableauText.setText(Tableau.current.scene.key);
-            this._tableauTextClass.setText(Tableau.current.constructor.name);
+            //this._tableauText.setText(Tableau.current.scene.key);
+            //this._tableauTextClass.setText(Tableau.current.constructor.name);
         }
     }
 }
