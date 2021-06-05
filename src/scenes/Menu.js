@@ -7,14 +7,16 @@ class Menu extends Phaser.Scene {
     {
     
       this.load.image('ecran', 'assets/illustration.png');
-        this.load.image('bouton', 'assets/bouton.png');
+        this.load.image('bouton', 'assets/logo1.png');
         
         
     }
   
     create()
     {
-        
+
+        var cam = this.cameras.main;
+        cam.zoomTo(0.5);
 
      
 

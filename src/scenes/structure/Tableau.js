@@ -18,46 +18,53 @@ class Tableau extends Phaser.Scene {
 
     preload() {
         this.load.image('Blood', 'assets/Blood.png');
-        this.load.image('ciel', 'assets/ciel.png');
-        this.load.image('rouge', 'assets/rouge.png');
-        this.load.audio('piece', 'assets/sounds/piece.mp3');
-        this.load.audio('mort', 'assets/sounds/mort.mp3');
-        this.load.audio('jojo', 'assets/sounds/jojo.mp3');
+        //this.load.image('ciel', 'assets/ciel.png');
+        this.load.image('coup', 'assets/coup.png');
 
-        this.load.spritesheet('yasuo2',
-            'assets/yasuo2.png',
-            {frameWidth: 58, frameHeight: 79}
+
+        this.load.spritesheet('persoSprite',
+            'assets/persoSprite.png',
+            {frameWidth: 128, frameHeight: 128}
         );
 
-        this.load.spritesheet('iddle',
-            'assets/iddle.png',
-            {frameWidth: 63, frameHeight: 80}
+        this.load.spritesheet('iddlAP',
+            'assets/iddlAP.png',
+            {frameWidth: 128, frameHeight: 128}
         );
-        this.load.spritesheet('iddle2',
-            'assets/iddle2.png',
-            {frameWidth: 63, frameHeight: 80}
+
+        this.load.spritesheet('dash1.0',
+            'assets/dash1.png',
+            {frameWidth: 128, frameHeight: 128}
+        );
+        this.load.spritesheet('dash2.0',
+            'assets/dash2.png',
+            {frameWidth: 128, frameHeight: 128}
+        );
+
+        this.load.spritesheet('saut',
+            'assets/saut.png',
+            {frameWidth: 128, frameHeight: 128}
+        );
+
+        this.load.spritesheet('saut2',
+            'assets/saut2.png',
+            {frameWidth: 128, frameHeight: 128}
+        );
+
+        this.load.spritesheet('chutePerso',
+            'assets/chutePerso.png',
+            {frameWidth: 128, frameHeight: 128}
+        );
+
+        this.load.spritesheet('chutePerso2',
+            'assets/chutePerso2.png',
+            {frameWidth: 128, frameHeight: 128}
         );
 
     }
 
     create() {
-        this.jumpCount = 0;
-        //musique
-        this.mort = this.sound.add('mort');
-        this.jojo = this.sound.add('jojo');
-        this.piece = this.sound.add('piece');
 
-        var musicConfig = {
-            mute: false,
-            volume: 0,
-            rate: 1,
-            detune: 0,
-            seek: 0,
-            loop: true,
-            delay: 0
-        }
-
-        this.jojo.play(musicConfig);
 
         Tableau.current = this;
         this.sys.scene.scale.lockOrientation("landscape")
@@ -68,17 +75,17 @@ class Tableau extends Phaser.Scene {
          * Le ciel en fond
          * @type {Phaser.GameObjects.Image}
          */
-        this.sky = this.add.image(0, 0, 'ciel').setOrigin(0, 0);
-        this.sky.displayWidth = 14 * 64;
-        this.sky.setScrollFactor(0, 0);
-        this.epee = new Attack(this, -1000, -1000, 'rouge');
+       // this.sky = this.add.image(0, 0, 'ciel').setOrigin(0, 0);
+        //this.sky.displayWidth = 14 * 64;
+       // this.sky.setScrollFactor(0, 0);
+        this.epee = new Attack(this, -1000, -1000);
         /**
          * Le joueur
          * @type {Player}
          */
 
 
-        this.player = new Player(this, 800, 400);
+        this.player = new Player(this, 300, 200);
         this.blood = this.add.sprite(this.sys.canvas.width / 2, this.sys.canvas.height / 2, "Blood")
         this.blood.displayWidth = 64;
         this.blood.displayHeight = 64;
@@ -90,6 +97,10 @@ class Tableau extends Phaser.Scene {
     update() {
         super.update();
         this.player.move();
+
+
+
+
     }
 
 
@@ -119,7 +130,7 @@ class Tableau extends Phaser.Scene {
                 from: 40,
                 to: 70,
 
-            },
+             },
             onComplete: function () {
                 me.blood.visible = false;
                 onComplete();
@@ -131,8 +142,6 @@ class Tableau extends Phaser.Scene {
     ramasserEtoile(player, star) {
         star.disableBody(true, true);
         ui.gagne();
-
-
         //va lister tous les objets de la scène pour trouver les étoies et vérifier si elles sont actives
         let totalActive = 0;
         for (let child of this.children.getChildren()) {
@@ -140,40 +149,52 @@ class Tableau extends Phaser.Scene {
                 if (child.active) {
                     totalActive++;
 
-                    var musicConfig = {
-                        mute: false,
-                        volume: 0.01,
-                        rate: 1,
-                        detune: 0,
-                        seek: 0,
-                        loop: false,
-                        delay: 0
-                    }
-
-                    this.piece.play(musicConfig);
                 }
             }
         }
         if (totalActive === 0) {
-            this.win();
+                this.win();
         }
+
     }
+
+
+    rammasse(player, pierre) {
+        pierre.disableBody(true, true);
+        ui.gagne();
+    }
+
+    rammasseUn(player, pierreUn) {
+        pierreUn.disableBody(true, true);
+        ui.gagne();
+    }
+
+stoped(player, arrete){
+    arrete.disableBody(true, true);
+    var cam = this.cameras.main;
+    cam.fadeOut(1000, 255, 100, 100)
+}
 
 
     rammasserBonusUn(player, bonus) {
         bonus.disableBody(true, true);
         ui.gagne();
         var cam = this.cameras.main;
-        this.rammasserBonusUn = true;
-        if (this.rammasserBonusUn == true) {
-            //cam.flash(2000, 305, 390, 290);
-            cam.pan(6000, 500, 6000, 'Power2');
+        //this.rammasserBonusUn = true;
+        //if (this.rammasserBonusUn === true) {
+        this.player.controlLock = true;
+            cam.pan(10000, 500, 6000, 'Quad.easeInOut');
+
             cam.zoomTo(0.5, 5000);
-            setTimeout(function () {
+
+            let p = this.player;
+            setTimeout(function() {
                 cam.zoomTo(1, 2000);
-            }, 2000)
+                p.controlLock = false;
+            }, 6000);
+
         }
-    }
+
 
     /**
      *
@@ -182,17 +203,14 @@ class Tableau extends Phaser.Scene {
      */
 
     etPaf(Attack, monster) {
-
-        console.log("touche");
+       // console.log("touche");
         //this.player.estEnTrainDAttaquer = true;
-
-
         monster.isDead = true; //ok le monstre est mort
         monster.disableBody(true, true);//plus de collisions
-        this.cameras.main.shake(200, 0.006, true,); //Screen Shaker
-
-
+        //this.cameras.main.shake(200, 0.006, true,); //Screen Shaker
     }
+
+
 
     /**
      * Aïeee ça fait mal
@@ -200,9 +218,11 @@ class Tableau extends Phaser.Scene {
      * @param spike
      */
     hitSpike(player, spike) {
+        let me = this;
+        console.log('tmort');
         this.physics.pause();
+        me.player.visible = false;
         var cam = this.cameras.main;
-        player.anims.play('turn');
         cam.setZoom(2);
         cam.fadeOut(1000, 0, 0, 0)
         cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
@@ -218,36 +238,9 @@ class Tableau extends Phaser.Scene {
 
     hitMonster(player, monster,) {
         let me = this;
-        if (monster.isDead !== true) { //si notre monstre n'est pas déjà mort
-            if (
 
-                // si le player descend
-                player.body.velocity.y > 0
-
-
-                // et si le bas du player est plus haut que le monstre
-                && player.getBounds().bottom < monster.getBounds().top + 30
-
-            ) {
-                ui.gagne();
-                monster.isDead = true;
-
-                this.mort.play();
-
-                this.cameras.main.shake(200, 0.015, true,);
-                monster.disableBody(true, true);//plus de collisions
-                this.saigne(monster, function () {
-                    //à la fin de la petite anim...ben il se passe rien :)
-                })
-                //notre joueur rebondit sur le monstre
-                player.directionY = 500;
-
-
-            } else {
                 //le joueur est mort
                 if (!me.player.isDead) {
-                    this.mort.play();
-                    this.jojo.stop();
                     me.player.isDead = true;
                     me.player.visible = false;
                     //ça saigne...
@@ -263,10 +256,6 @@ class Tableau extends Phaser.Scene {
 
                     })
 
-                }
-
-
-            }
         }
 
     }
@@ -287,7 +276,6 @@ class Tableau extends Phaser.Scene {
     win() {
         Tableau.suivant();
         localStorage.removeItem("checkPoint");
-        this.jojo.stop();
     }
 
     /**

@@ -1,8 +1,8 @@
-class TableauTiled extends Tableau {
+class MenuTest extends Tableau {
 
 
     constructor() {
-        super("Niveau01");
+        super("MenuTest");
     }
 
     preload() {
@@ -19,6 +19,9 @@ class TableauTiled extends Tableau {
         this.load.image('logo1', 'assets/logo1.png');
         this.load.image('casque', 'assets/casque.png');
 
+        this.load.image('play', 'assets/play.png');
+        this.load.image('option', 'assets/option.png');
+
         this.load.image('ile', 'assets/iles.png');
 
         this.load.image('caillou1', 'assets/caillou1.png');
@@ -27,10 +30,6 @@ class TableauTiled extends Tableau {
         this.load.image('Red', 'assets/red.png');
         this.load.image('rosed', 'assets/rosed.png');
 
-        this.load.image('orange', 'assets/sparkOrange.png');
-        this.load.image('rougeF', 'assets/sparkRougeF.png');
-        this.load.image('jaune', 'assets/sparkJaune.png');
-        this.load.image('rouge', 'assets/spark.png');
 
         this.load.image('tutoDash', 'assets/tutoDash1.png');
         this.load.image('tutoDoubleSaut', 'assets/tutoDoubleSaut1.png');
@@ -42,10 +41,10 @@ class TableauTiled extends Tableau {
 
         this.load.image('yokai1', 'assets/yokai1.png');
         this.load.image('ciel', 'assets/ciel.png');
-        this.load.image('nuage', 'assets/nuage.png');
+        this.load.image('nuageMenu', 'assets/nuageMenu1.png');
 
         //les données du tableau qu'on a créé dans TILED
-        this.load.tilemapTiledJSON('map', 'assets/tilemaps/NiveauTuto3.json');
+        this.load.tilemapTiledJSON('mappa', 'assets/tilemaps/NiveauTuto4.json');
         //on y trouve notre étoiles et une tête de mort
         this.load.atlas('particles', 'assets/particles/particles.png', 'assets/particles/particles.json');
 
@@ -70,6 +69,8 @@ class TableauTiled extends Tableau {
         this.isTexte1 = 0;
         this.isTexte2 = 0;
         var cam = this.cameras.main;
+
+        this.player = new Player(this, 440, 674);
         //this.isTexte1 = 0;
         //video
 
@@ -77,7 +78,7 @@ class TableauTiled extends Tableau {
         //--------chargement de la tile map & configuration de la scène-----------------------
 
         //notre map
-        this.map = this.make.tilemap({key: 'map'});
+        this.map = this.make.tilemap({key: 'mappa'});
         //nos images qui vont avec la map
         this.tileset = this.map.addTilesetImage('SpriteSheet', 'tiles');
 
@@ -86,12 +87,12 @@ class TableauTiled extends Tableau {
         let hauteurDuTableau = this.map.heightInPixels;
         this.physics.world.setBounds(0, 0, largeurDuTableau, hauteurDuTableau);
         this.cameras.main.setBounds(0, 0, largeurDuTableau, hauteurDuTableau);
-        this.cameras.main.startFollow(this.player, true, 0.8, 0.8, -90, 30);
+        this.cameras.main.startFollow(this.player, true, 0.8, 0.8, -90, 50);
 
         //---- ajoute les plateformes simples ----------------------------
         this.solides = this.map.createLayer('solides', this.tileset, 0, 0);
-        this.solideMonster = this.map.createLayer('solideMonster', this.tileset, 0, 0);
         this.lave = this.map.createLayer('lave', this.tileset, 0, 0);
+        this.solideMonster = this.map.createLayer('solideMonster', this.tileset, 0, 0);
         //this.light = this.map.createLayer('light', this.tileset, 0, 0);
         this.derriere3 = this.map.createLayer('derriere3', this.tileset, 0, 0);
         this.derriere1 = this.map.createLayer('derriere1', this.tileset, 0, 0);
@@ -104,7 +105,7 @@ class TableauTiled extends Tableau {
         this.lave.setCollisionByExclusion(-1, true);
         this.solides.setCollisionByExclusion(-1, true);
         this.solideMonster.setCollisionByExclusion(-1, true);
-        //this.solideMonster.setCollisionByProperty({collides:true});
+
 
 
         this.plightContainer = this.add.container();
@@ -112,7 +113,7 @@ class TableauTiled extends Tableau {
         this.monstersContainer = this.add.container();
         this.caillouContainer = this.add.container();
         this.cailloulContainer = this.add.container();
-        //---------------light--------------------
+
         ici.plight = ici.map.getObjectLayer('lights')['objects'];
         ici.plight.forEach(plightObjects => {
             let light = new Light(this, plightObjects.x + 16, plightObjects.y - 10).setDepth(9999);
@@ -131,7 +132,7 @@ class TableauTiled extends Tableau {
         ici.alight = ici.map.getObjectLayer('lightChek')['objects'];
         ici.alight.forEach(alightObjects => {
             let alight = new Light(this, alightObjects.x, alightObjects.y).setDepth(9999);
-            alight.addLight(this, 178, 12, 15, 300, 0.4, 0.05, false);
+            alight.addLight(this, 178, 12, 15, 300, 0.5, 0.05, false);
             this.lightContainer.add(alight);
         });
         //----------------bonus 1------------------------
@@ -234,7 +235,64 @@ class TableauTiled extends Tableau {
             point.checkPointObject = checkPointObject;
         });
 
+        //--------effet sur la lave------------------------
 
+        this.laveFxContainer = this.add.container();
+        this.lave.forEachTile(function (tile) { //on boucle sur TOUTES les tiles de lave pour générer des particules
+            if (tile.index !== -1) { //uniquement pour les tiles remplies
+                //on va créer des particules
+                let props = {
+                    frame: [
+                        //'star', //pour afficher aussi des étoiles
+                        'death-white'
+                    ],
+                    frequency: 200,
+                    lifespan: 2000,
+                    quantity: 2,
+                    x: {min: -32, max: 32},
+                    y: {min: -12, max: 52},
+                    tint: [0xC11A05, 0x883333, 0xBB5500, 0xFF7F27],
+                    rotate: {min: -10, max: 10},
+                    speedX: {min: -10, max: 10},
+                    speedY: {min: -20, max: -30},
+                    scale: {start: 0, end: 1},
+                    alpha: {start: 1, end: 0},
+                    blendMode: Phaser.BlendModes.ADD,
+                };
+                let props2 = {...props}; //copie props sans props 2
+                props2.blendMode = Phaser.BlendModes.MULTIPLY; // un autre blend mode plus sombre
+
+                //ok tout est prêt...ajoute notre objet graphique
+                let laveParticles = ici.add.particles('particles');
+
+                //ajoute le premier émetteur de particules
+                laveParticles.createEmitter(props);
+                //on ne va pas ajouter le second effet émetteur mobile car il consomme trop de ressources
+                if (!ici.isMobile) {
+                    laveParticles.createEmitter(props2); // ajoute le second
+                }
+                // positionne le tout au niveau de la tile
+                laveParticles.x = tile.pixelX + 32;
+                laveParticles.y = tile.pixelY + 32;
+                ici.laveFxContainer.add(laveParticles);
+
+                //optimisation (les particules sont invisibles et désactivées par défaut)
+                //elles seront activées via update() et optimizeDisplay()
+                laveParticles.pause();
+                laveParticles.visible = false;
+                //on définit un rectangle pour notre tile de particules qui nous servira plus tard
+                laveParticles.rectangle = new Phaser.Geom.Rectangle(tile.pixelX, tile.pixelY, 64, 64);
+
+            }
+
+        })
+
+        //--------allez on se fait un peu la même en plus simple mais avec les étoiles----------
+
+
+
+
+        //----------débug---------------------
 
         //pour débugger les collisions sur chaque layer
         let debug = this.add.graphics().setAlpha(this.game.config.physics.arcade.debug ? 0.75 : 0);
@@ -277,9 +335,9 @@ class TableauTiled extends Tableau {
         this.sky3 = this.add.tileSprite(
             this.sys.canvas.width * -1,
             this.sys.canvas.height * -1,
-            this.sys.canvas.width * 3,
-            this.sys.canvas.height * 3,
-            'nuage'
+            this.sys.canvas.width * 2,
+            this.sys.canvas.height * 2,
+            'nuageMenu'
         );
 
 
@@ -291,6 +349,7 @@ class TableauTiled extends Tableau {
         this.sky3.setScrollFactor(0);//fait en sorte que le ciel ne suive pas la caméra
 
 
+
         this.anims.create({
             key: 'eau',
             frames: this.anims.generateFrameNumbers('chute1', {start: 0, end: 7}),
@@ -298,173 +357,46 @@ class TableauTiled extends Tableau {
             repeat: -1
         });
 
-        this.maChute = this.add.sprite(3460, 750, 'chute1').play('chute1', true).setDepth(999999);
+        this.maChute = this.add.sprite(50, 773, 'chute1').play('chute1', true).setDepth(984);
 
         this.maChute.anims.play('eau', true);
 
 
-        this.maChute1 = this.add.sprite(7420, 787, 'chute1').play('chute1', true).setDepth(999999);
+        let startB1 = this.add.sprite(665, 640, 'play').setDepth(9999999);
 
-        this.maChute1.anims.play('eau', true);
-
-       this.anims.create({
-            key: 'zoom',
-            frames: this.anims.generateFrameNumbers('portail1', {start: 0, end: 7}),
-            frameRate:  9,
-            repeat: -1
-        });
-
-        this.monPortail = this.add.sprite(9577, 176, 'portail1').play('portail1', true).setDepth(999999);
-
-        this.monPortail.anims.play('zoom', true);
-
-
-        this.pnj = this.add.sprite(2500, 550, 'tutoSaut').setAlpha(0);
-        this.pnj1 = this.add.sprite(4100, 550, 'tutoDoubleSaut').setAlpha(0);
-        this.pnj2 = this.add.sprite(6450, 750, 'tutoDash').setAlpha(0);
-        // this.pnj2=this.add.sprite(2200, 650, 'tutoDash1').setAlpha(0);
-
-
-       var particles10 = this.add.particles('rosed');
-        var rect1 = new Phaser.Geom.Rectangle(650, 400, 50, 50);
-        particles10.createEmitter({
-            x: 50, y: 50,
-            moveToX: {min: 1500, max: 2500},
-            moveToY: {min: 300, max: 600},
-            rotate: {min: -10, max: 360},
-            lifespan: 10000,
-            // alpha:0.5,
-            quantity: 3,
-            frequency: 500,
-            delay: 100,
-            depth: 10,
-            scale: {start: 0.6, end: 0.2},
-            //blendMode: 'ADD',
-            emitZone: {source: rect1}
-        });
-
-       var particles11 = this.add.particles('Red');
-        var rect2 = new Phaser.Geom.Rectangle(650, 420, 50, 50);
-        particles11.createEmitter({
-            x: 50, y: 50,
-            moveToX: {min: 1500, max: 2500},
-            moveToY: {min: 600, max: 300},
-            rotate: {min: -10, max: 360},
-            lifespan: 10000,
-            quantity: 3,
-            frequency: 500,
-            delay: 100,
-            depth: 10,
-            scale: {start: 0.6, end: 0.2},
-            //blendMode: 'ADD',
-            emitZone: {source: rect2}
-        });
-
-        //----exemple pou faire ensorte qu'un image appraisse quand on aprroche ou non
-        let doorLight = [];
-        doorLight[0] = this.add.pointlight(9560, 100, 0, 250, 0.3).setDepth(99999999);
-        doorLight[1] = this.add.pointlight(9560, 180, 0, 250, 0.3).setDepth(99999999);
-        doorLight[2] = this.add.pointlight(9560, 260, 0, 250, 0.3).setDepth(99999999);
-        doorLight.forEach(p => {
-            p.attenuation = 0.04;
-            p.color.setTo(255, 100, 100);
-
-            this.tweens.add({
-                targets: p,
-                duration: 2000,
-                repeat: -1,
+        this.tweens.add(
+            {
+                targets:[startB1],
+                duration:2000,
                 yoyo: true,
-                delay: 1000,
-                alpha: {
-                    startdeDelay: 0,
-                    from: 0.5,
-                    to: 0.9
-                }
+                repeat:-1,
+                delay:Math.random()*5000,
+                alpha:
+                    {
+                        startDelay:Math.random()*5000,
+                        from:0.1,
+                        to:1,
+                    }
             })
-        })
 
-        let ChekLight = [];
-        ChekLight[0] = this.add.pointlight(2144, 710, 0, 50, 0.7).setDepth(9999999);
-        ChekLight[1] = this.add.pointlight(3872.13, 710, 0, 50, 0.7).setDepth(9999999);
-        ChekLight[2] = this.add.pointlight(4992, 522, 0, 50, 0.7).setDepth(9999999);
-        ChekLight[3] = this.add.pointlight(3648.25, 295, 0, 50, 0.7).setDepth(9999999);
-        ChekLight[4] = this.add.pointlight(6496.41, 870, 0, 50, 0.7).setDepth(9999999);
-        ChekLight[5] = this.add.pointlight(7200, 360, 0, 50, 0.7).setDepth(9999999);
-        ChekLight.forEach(q => {
-            q.attenuation = 0.05;
-            q.color.setTo(149, 11, 209);
 
-            this.tweens.add({
-                targets: q,
-                duration: 1000,
-                repeat: -1,
+
+        let startB2 = this.add.sprite(240, 650, 'option').setDepth(9999999);
+
+        this.tweens.add(
+            {
+                targets:[startB2],
+                duration:2000,
                 yoyo: true,
-                delay: 500,
-                alpha: {
-                    startdeDelay: 0,
-                    from: 0.5,
-                    to: 1
-                }
+                repeat:-1,
+                delay:Math.random()*5000,
+                alpha:
+                    {
+                        startDelay:Math.random()*5000,
+                        from:0.1,
+                        to:1,
+                    }
             })
-        })
-
-
-        var particles2 = this.add.particles('jaune');
-        var rect = new Phaser.Geom.Rectangle(9600, 80, 50, 150);
-        particles2.createEmitter({
-            x: 50, y: 100,
-            moveToX: {min: 9000, max: 8000},
-            moveToY: {min: 100, max: 400},
-            rotate: {min: -10, max: 360},
-            lifespan: 5000,
-            alpha: 0.5,
-            quantity: 2,
-            frequency: 200,
-            delay: 100,
-            //depth: 10,
-            scale: {start: 1.5, end: 0.2},
-            //blendMode: 'ADD',
-            emitZone: {source: rect}
-        });
-
-
-        var particles3 = this.add.particles('rouge');
-        var rect = new Phaser.Geom.Rectangle(9600, 80, 50, 150);
-        particles3.createEmitter({
-            x: 50, y: 50,
-            moveToX: {min: 9000, max: 8500},
-            moveToY: {min: 100, max: 400},
-            rotate: {min: -10, max: 360},
-            lifespan: 4000,
-            alpha: 0.5,
-            quantity: 2,
-            frequency: 200,
-            delay: 100,
-            //depth: 10,
-            scale: {start: 1.5, end: 0.2},
-            //blendMode: 'ADD',
-            emitZone: {source: rect}
-        });
-
-        var particles4 = this.add.particles('rougeF');
-        var rect = new Phaser.Geom.Rectangle(9600, 80, 50, 150);
-        particles4.createEmitter({
-            x: 50, y: 100,
-            moveToX: {min: 9000, max: 8800},
-            moveToY: {min: 100, max: 400},
-            rotate: {min: -10, max: 360},
-            lifespan: 2000,
-            alpha: 0.5,
-            quantity: 1,
-            frequency: 200,
-            delay: 100,
-           // depth: 10,
-            scale: {start: 1.5, end: 0.5},
-            //blendMode: 'ADD',
-            emitZone: {source: rect}
-        });
-
-
         //----------collisions---------------------
 
         //quoi collide avec quoi?
@@ -496,27 +428,19 @@ class TableauTiled extends Tableau {
 
         this.blood.setDepth(z--);
         //monstersContainer.setDepth(z--);
-
         this.pierre.setDepth(z--);
+        this.monstersContainer.setDepth(z--);
         this.caillouContainer.setDepth(z--);
         this.cailloulContainer.setDepth(z--);
         //this.pnj1.setDepth(z--);
         this.devant2.setDepth(z--);
         this.devant.setDepth(z--);
-        this.monstersContainer.setDepth(z--);
-        particles2.setDepth(z--);
-        particles3.setDepth(z--);
-        particles4.setDepth(z--);
         this.solides.setDepth(z--);
         this.player.setDepth(z--);
         this.checkPoints.setDepth(z--);
-        this.pnj.setDepth(z--);
-        this.pnj1.setDepth(z--);
-        this.pnj2.setDepth(z--);
+        this.laveFxContainer.setDepth(z--);
         this.lave.setDepth(z--);
         this.derriere.setDepth(z--);
-        particles10.setDepth(z--);
-        particles11.setDepth(z--);
         this.derriere1.setDepth(z--);
         this.derriere2.setDepth(z--);
         this.derriere3.setDepth(z--);
@@ -538,104 +462,38 @@ class TableauTiled extends Tableau {
     }
 
 
-    apparitionTexte() {
 
-        if (this.player.x > 2100 && this.isTexte == 0) {
-            this.isTexte++;
-            this.tweens.add({
-                targets: this.pnj,
-                duration: 2000,
-                yoyo: false,
-                delay: 200,
-                alpha: {
-                    startDelay: 0,
-                    from: 0,
-                    to: 1
+
+
+    /**
+     * Permet d'activer, désactiver des éléments en fonction de leur visibilité dans l'écran ou non
+     */
+    optimizeDisplay() {
+
+        //return;
+        let world = this.cameras.main.worldView; // le rectagle de la caméra, (les coordonnées de la zone visible)
+
+        // on va activer / désactiver les particules de lave
+        for (let particule of this.laveFxContainer.getAll()) { // parcours toutes les particules de lave
+            if (Phaser.Geom.Rectangle.Overlaps(world, particule.rectangle)) {
+                //si le rectangle de la particule est dans le rectangle de la caméra
+                if (!particule.visible) {
+                    //on active les particules
+                    particule.resume();
+                    particule.visible = true;
                 }
-            })
-        } else if (this.player.x > 3000 && this.isTexte == 1) {
-            this.isTexte++;
-            this.tweens.add({
-                targets: this.pnj,
-                duration: 2000,
-                yoyo: false,
-                delay: 200,
-                alpha: {
-                    startDelay: 0,
-                    from: 1,
-                    to: 0
+            } else {
+                //si le rectangle de la particule n'est PAS dans le rectangle de la caméra
+                if (particule.visible) {
+                    //on désactive les particules
+                    particule.pause();
+                    particule.visible = false;
                 }
-            })
+            }
         }
 
+
     }
-
-    apparitionTexte1() {
-
-        if (this.player.x > 3600 && this.isTexte1 == 0) {
-            this.isTexte1++;
-            this.tweens.add({
-                targets: this.pnj1,
-                duration: 2000,
-                yoyo: false,
-                delay: 200,
-                alpha: {
-                    startDelay: 0,
-                    from: 0,
-                    to: 1
-                }
-            })
-        } else if (this.player.x > 5000 && this.isTexte1 == 1) {
-            this.isTexte1++;
-            this.tweens.add({
-                targets: this.pnj1,
-                duration: 2000,
-                yoyo: false,
-                delay: 200,
-                alpha: {
-                    startDelay: 0,
-                    from: 1,
-                    to: 0
-                }
-            })
-        }
-    }
-
-
-    apparitionTexte2() {
-
-        if (this.player.x > 6100 && this.isTexte2 == 0) {
-            this.isTexte2++;
-            this.tweens.add({
-                targets: this.pnj2,
-                duration: 2000,
-                yoyo: false,
-                delay: 200,
-                alpha: {
-                    startDelay: 0,
-                    from: 0,
-                    to: 1
-                }
-            })
-        } else if (this.player.x > 7000 && this.isTexte2 == 1) {
-            this.isTexte2++;
-            this.tweens.add({
-                targets: this.pnj2,
-                duration: 2000,
-                yoyo: false,
-                delay: 200,
-                alpha: {
-                    startDelay: 0,
-                    from: 1,
-                    to: 0
-                }
-            })
-        }
-    }
-
-
-
-
 
 
     // Ne pas oublier de nommer chaques checkpoints sur Tiled
@@ -678,9 +536,6 @@ class TableauTiled extends Tableau {
     update() {
         super.update();
         this.moveParallax();
-        this.apparitionTexte();
-        this.apparitionTexte1();
-        this.apparitionTexte2();
         //optimisation
         //teste si la caméra a bougé
         let actualPosition = JSON.stringify(this.cameras.main.worldView);
@@ -689,10 +544,10 @@ class TableauTiled extends Tableau {
             || this.previousPosition !== actualPosition
         ) {
             this.previousPosition = actualPosition;
+            this.optimizeDisplay();
         }
 
     }
 
 
 }
-

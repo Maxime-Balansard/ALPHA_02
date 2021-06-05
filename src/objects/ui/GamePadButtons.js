@@ -6,6 +6,8 @@ class GamePadButtons extends GameKeyboard{
         super(scene, x, y)
         scene.add.existing(this);
 
+        game.input.addPointer(3);
+
         this.size=size;
         let w=this.size/2;
         let pad2=scene.add.container();
@@ -13,15 +15,15 @@ class GamePadButtons extends GameKeyboard{
         let btnUP=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
         let btnLEFT=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
         let btnRIGHT=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
-        let btnDOWN=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
+        let btnDASH=scene.add.circle(0,0,w/2,0xff2D00,0.5).setInteractive();
 
 
-        let btnA=scene.add.circle(0,0,w/2,0xffffff,0.3).setInteractive();
+        let btnA=scene.add.circle(0,0,w/2,0xffffff,0.5).setInteractive();
 
         this.add(btnUP);
         this.add(btnLEFT);
         this.add(btnRIGHT);
-        this.add(btnDOWN);
+        this.add(btnDASH);
 
         this.add(btnA);
 
@@ -30,11 +32,12 @@ class GamePadButtons extends GameKeyboard{
         btnRIGHT.x=w*2;
         btnLEFT.y=w;
         btnRIGHT.y=w;
-        btnDOWN.x=w;
-        btnDOWN.y=w*2;
+
+        btnDASH.x=scene.sys.canvas.width * -1 + w * 4;
+        btnDASH.y=w*2;
 
         btnA.x=scene.sys.canvas.width * -1 + w * 4;
-        btnA.y=w*1;
+        btnA.y=w*0;
 
 
         btnLEFT.on('pointerdown',function(){
@@ -46,7 +49,7 @@ class GamePadButtons extends GameKeyboard{
         btnUP.on('pointerdown',function(){
             Tableau.current.player.directionY=-1;
         });
-        btnDOWN.on('pointerdown',function(){
+        btnDASH.on('pointerdown',function(){
             Tableau.current.player.directionY=1;
         });
 
@@ -59,8 +62,9 @@ class GamePadButtons extends GameKeyboard{
         btnUP.on('pointerup',function(){
             Tableau.current.player.directionY=-0;
         });
-        btnDOWN.on('pointerup',function(){
-            Tableau.current.player.directionY=0;
+        btnDASH.on('pointerup',function(){
+            Tableau.current.player.dash();
+            Tableau.current.player.attaque();
         });
 
 

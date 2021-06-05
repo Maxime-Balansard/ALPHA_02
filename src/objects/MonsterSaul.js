@@ -1,4 +1,4 @@
-class MonsterSol extends ObjetEnnemi{
+class MonsterSaul extends ObjetEnnemi{
     /**
      *
      * @param {Tableau} scene
@@ -6,7 +6,7 @@ class MonsterSol extends ObjetEnnemi{
      * @param y
      */
     constructor(scene, x, y) {
-        super(scene, x, y, "caillou1");
+        super(scene, x, y, "caillou2");
         //pas de gravité
         this.body.allowGravity=false;
         this.setCollideWorldBounds(true);
@@ -34,18 +34,18 @@ class MonsterSol extends ObjetEnnemi{
         //on fait apparaitre notre objet avec un petit delay, puis on lance l'animation
         //ceci a pour effet de décaler les animations pour ce même objet
         scene.tweens.add({
-                targets:this,
-                duration:100,
-                delay:Math.random()*1000,
-                alpha:{
-                    startDelay:Math.random()*1000,
-                    from:0,
-                    to:1,
-                },
-                onComplete: function () {
-                    me.start();
-                }
-            })
+            targets:this,
+            duration:100,
+            delay:Math.random()*1000,
+            alpha:{
+                startDelay:Math.random()*1000,
+                from:0,
+                to:1,
+            },
+            onComplete: function () {
+                me.start();
+            }
+        })
 
     }
 
